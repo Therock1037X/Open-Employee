@@ -21,17 +21,24 @@ export function Card({
 }: CardProps) {
   const shouldReduceMotion = useReducedMotion();
 
-  const motionProps = shouldReduceMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: 14 },
-        animate: { opacity: 1, y: 0 },
-        transition: {
-          duration: 0.3,
-          ease: "easeOut",
-          delay: animateIndex * 0.06, // 60ms stagger between items
-        },
-      };
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const motionProps =
+    !isClient || shouldReduceMotion
+      ? { initial: false, animate: { opacity: 1, y: 0 } }
+      : {
+          initial: { opacity: 0, y: 14 },
+          animate: { opacity: 1, y: 0 },
+          transition: {
+            duration: 0.3,
+            ease: "easeOut",
+            delay: animateIndex * 0.06,
+          },
+        };
 
   return (
     <motion.div

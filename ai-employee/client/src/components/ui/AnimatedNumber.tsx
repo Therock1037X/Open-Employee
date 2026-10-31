@@ -23,7 +23,7 @@ export function AnimatedNumber({
   isGold = true,
 }: AnimatedNumberProps) {
   const shouldReduceMotion = useReducedMotion();
-  const [displayValue, setDisplayValue] = useState(shouldReduceMotion ? value : 0);
+  const [displayValue, setDisplayValue] = useState(value);
 
   useEffect(() => {
     if (shouldReduceMotion) {

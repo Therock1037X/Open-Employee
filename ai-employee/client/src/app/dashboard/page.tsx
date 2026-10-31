@@ -42,6 +42,11 @@ export default function DashboardPage() {
   const [auditLogs, setAuditLogs] = useState<AuditEvent[]>([]);
   const [lowStockCount, setLowStockCount] = useState(0);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Sales Trend Chart Data
   const chartData = [
@@ -187,39 +192,43 @@ export default function DashboardPage() {
               </div>
 
               {/* Recharts Area Chart in Gold / Navy */}
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="goldGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#FCA311" stopOpacity={0.45} />
-                        <stop offset="95%" stopColor="#14213D" stopOpacity={0.0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                    <XAxis dataKey="time" stroke="#E5E5E5" fontSize={11} tickLine={false} />
-                    <YAxis stroke="#E5E5E5" fontSize={11} tickLine={false} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#14213D",
-                        borderColor: "rgba(255,255,255,0.12)",
-                        borderRadius: "1rem",
-                        color: "#FFFFFF",
-                        fontSize: "12px",
-                      }}
-                      itemStyle={{ color: "#FCA311" }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="sales"
-                      stroke="#FCA311"
-                      strokeWidth={2.5}
-                      fillOpacity={1}
-                      fill="url(#goldGradient)"
-                      isAnimationActive={!shouldReduceMotion}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+              <div className="h-64 w-full flex items-center justify-center">
+                {isMounted ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="goldGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#FCA311" stopOpacity={0.45} />
+                          <stop offset="95%" stopColor="#14213D" stopOpacity={0.0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                      <XAxis dataKey="time" stroke="#E5E5E5" fontSize={11} tickLine={false} />
+                      <YAxis stroke="#E5E5E5" fontSize={11} tickLine={false} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#14213D",
+                          borderColor: "rgba(255,255,255,0.12)",
+                          borderRadius: "1rem",
+                          color: "#FFFFFF",
+                          fontSize: "12px",
+                        }}
+                        itemStyle={{ color: "#FCA311" }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="sales"
+                        stroke="#FCA311"
+                        strokeWidth={2.5}
+                        fillOpacity={1}
+                        fill="url(#goldGradient)"
+                        isAnimationActive={!shouldReduceMotion}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="w-full h-full skeleton-shimmer rounded-xl opacity-30" />
+                )}
               </div>
             </Card>
 
