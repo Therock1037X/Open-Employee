@@ -1,33 +1,51 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Mic, MicOff, Send, Sparkles, CheckCircle2, ArrowRight, RefreshCw, AlertCircle, Volume2 } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import {
+  Mic,
+  MicOff,
+  Send,
+  Sparkles,
+  CheckCircle2,
+  AlertCircle,
+  RefreshCw,
+  Volume2,
+} from "lucide-react";
 import { api, ParsedEntry } from "@/lib/api";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { useToast } from "@/components/ui/Toast";
 
 interface MultilingualEntryBoxProps {
   onTransactionCreated?: () => void;
 }
 
 export function MultilingualEntryBox({ onTransactionCreated }: MultilingualEntryBoxProps) {
+  const { toast } = useToast();
+  const shouldReduceMotion = useReducedMotion();
+
   const [inputText, setInputText] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState<"Hindi" | "Marathi" | "English">("Hindi");
   const [isListening, setIsListening] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [parsed, setParsed] = useState<ParsedEntry | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [agentTypingText, setAgentTypingText] = useState("");
+
   const recognitionRef = useRef<any>(null);
 
-  // Quick preset pills for Indian MSME store operations
-  const quickPills = [
-    { label: "2 kg sugar becha Ramesh ko 90 rs", type: "sale" },
-    { label: "1.5 kg toor dal becha 247 rs", type: "sale" },
-    { label: "5 packet biscuit becha 100 me", type: "sale" },
-    { label: "Restocked 20 kg Atta 800 rs", type: "stock" },
-    { label: "Paid 500 shop electricity bill", type: "expense" },
+  const langChips: ("Hindi" | "Marathi" | "English")[] = ["Hindi", "Marathi", "English"];
+
+  const examplePills = [
+    { label: "2 kg sugar becha Ramesh ko 90 rs", lang: "Hindi" },
+    { label: "10 packet biscuit becha 100 rs", lang: "Hindi" },
+    { label: "5 liter tel vikla Suresh la 750 rs", lang: "Marathi" },
+    { label: "Restocked 20 kg Atta for 800 rs", lang: "English" },
+    { label: "Paid 500 shop electricity bill", lang: "English" },
   ];
 
-  // Initialize Web Speech API if supported in browser
+  // Initialize Web Speech API
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognition =
@@ -36,7 +54,12 @@ export function MultilingualEntryBox({ onTransactionCreated }: MultilingualEntry
         const recognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = true;
-        recognition.lang = "hi-IN"; // Default to Indian Hindi/Hinglish
+        recognition.lang =
+          selectedLanguage === "Hindi"
+            ? "hi-IN"
+            : selectedLanguage === "Marathi"
+            ? "mr-IN"
+            : "en-IN";
 
         recognition.onresult = (event: any) => {
           let currentTranscript = "";
@@ -46,24 +69,19 @@ export function MultilingualEntryBox({ onTransactionCreated }: MultilingualEntry
           setInputText(currentTranscript);
         };
 
-        recognition.onerror = (event: any) => {
-          console.warn("Speech recognition error:", event.error);
-          setIsListening(false);
-        };
-
-        recognition.onend = () => {
-          setIsListening(false);
-        };
+        recognition.onerror = () => setIsListening(false);
+        recognition.onend = () => setIsListening(false);
 
         recognitionRef.current = recognition;
       }
     }
-  }, []);
+  }, [selectedLanguage]);
 
-  // Trigger parsing when text changes significantly or is chosen
+  // NLP Parse effect with typing/streaming simulation
   useEffect(() => {
     if (!inputText.trim()) {
       setParsed(null);
+      setAgentTypingText("");
       return;
     }
 
@@ -72,26 +90,39 @@ export function MultilingualEntryBox({ onTransactionCreated }: MultilingualEntry
         setIsParsing(true);
         const result = await api.parseEntry(inputText);
         setParsed(result);
+
+        // Streaming text effect for agent interpretation
+        const fullMessage = `Interpreted ${result.action_type.toUpperCase()}: ${result.quantity || 1} ${result.unit || "unit"} ${result.product || "Product"} for ₹${(result.amount || 0).toFixed(2)}${result.party ? ` to ${result.party}` : ""}. Ready to save into business ledger.`;
+        let charIndex = 0;
+        setAgentTypingText("");
+        const typeInterval = setInterval(() => {
+          if (charIndex <= fullMessage.length) {
+            setAgentTypingText(fullMessage.slice(0, charIndex));
+            charIndex += 2;
+          } else {
+            clearInterval(typeInterval);
+          }
+        }, 15);
       } catch (err) {
-        console.error("Parse error:", err);
+        console.error(err);
       } finally {
         setIsParsing(false);
       }
-    }, 350);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [inputText]);
 
   const toggleMic = () => {
     if (!recognitionRef.current) {
-      // Simulate speech recognition fallback for testing
       if (!isListening) {
         setIsListening(true);
-        setInputText("Listening to voice in Hindi...");
-        setTimeout(() => {
-          setInputText("2 kg sugar becha Ramesh ko 90 rs");
-          setIsListening(false);
-        }, 2200);
+        setInputText(
+          selectedLanguage === "Marathi"
+            ? "5 liter tel vikla Suresh la 750 rs"
+            : "2 kg sugar becha Ramesh ko 90 rs"
+        );
+        setTimeout(() => setIsListening(false), 2000);
       } else {
         setIsListening(false);
       }
@@ -111,13 +142,11 @@ export function MultilingualEntryBox({ onTransactionCreated }: MultilingualEntry
     }
   };
 
-  const handleCommitTransaction = async () => {
+  const handleCommit = async () => {
     if (!parsed || !inputText.trim()) return;
 
     try {
       setIsSubmitting(true);
-      setErrorMessage(null);
-
       if (parsed.action_type === "sale" || parsed.action_type === "unknown") {
         const qty = parsed.quantity || 1;
         const total = parsed.amount || 90;
@@ -127,198 +156,194 @@ export function MultilingualEntryBox({ onTransactionCreated }: MultilingualEntry
           quantity: qty,
           unit: parsed.unit || "unit",
           price: pricePerUnit,
-          customer: parsed.party || "Customer",
+          customer: parsed.party || "Walk-in Customer",
           raw_text: inputText,
-          lang: parsed.detected_lang,
+          lang: selectedLanguage.toLowerCase(),
         });
-        setSuccessMessage(`Recorded Sale: ${qty} ${parsed.unit || "unit"} ${parsed.product} (₹${total.toFixed(2)})`);
+        toast(`Sale Recorded: ${qty} ${parsed.unit || "unit"} ${parsed.product} (₹${total.toFixed(2)})`, "success");
       } else if (parsed.action_type === "stock_in") {
         await api.adjustStock(parsed.product || "General Item", parsed.quantity || 10, "purchase");
-        setSuccessMessage(`Stock Updated: Added ${parsed.quantity || 10} units of ${parsed.product}`);
+        toast(`Stock Updated: Added ${parsed.quantity || 10} units of ${parsed.product}`, "success");
       } else {
-        setSuccessMessage(`Recorded Expense: ₹${parsed.amount || 500} for ${parsed.product || "Store Operation"}`);
+        toast(`Expense Logged: ₹${parsed.amount || 500} for ${parsed.product || "Store Operation"}`, "gold");
       }
 
       setInputText("");
       setParsed(null);
+      setAgentTypingText("");
       if (onTransactionCreated) {
         onTransactionCreated();
       }
-
-      setTimeout(() => setSuccessMessage(null), 4500);
     } catch (err: any) {
-      setErrorMessage(err.message || "Failed to record transaction");
+      toast(err.message || "Failed to commit entry", "error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="w-full glass-card rounded-2xl p-4 sm:p-6 border border-gray-800/90 shadow-2xl relative overflow-hidden">
-      {/* Background ambient gradient glow */}
-      <div className="absolute -top-24 -right-24 w-72 h-72 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Header with Title & Mic indicator */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-        <div className="flex items-center space-x-2.5">
-          <div className="p-2 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
-            <Sparkles className="w-4 h-4" />
-          </div>
-          <div>
-            <h3 className="text-sm sm:text-base font-semibold text-gray-100 flex items-center space-x-2">
-              <span>Multilingual Voice & Text Entry</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 font-normal">
-                Bhashini + vLLM
-              </span>
-            </h3>
-            <p className="text-xs text-gray-400">
-              Speak or write in Hindi, Hinglish, or regional terms to update sales, inventory & finance.
-            </p>
+    <div className="w-full bg-surface border border-white/[0.08] rounded-2xl p-5 sm:p-6 shadow-2xl relative overflow-hidden">
+      {/* Top Language Selector Chips and Agent Status */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div className="flex items-center space-x-2">
+          <span className="text-xs text-text-muted font-medium">Input Language:</span>
+          <div className="flex items-center space-x-1.5 p-1 bg-base rounded-xl border border-white/[0.08]">
+            {langChips.map((lang) => (
+              <button
+                key={lang}
+                onClick={() => setSelectedLanguage(lang)}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                  selectedLanguage === lang
+                    ? "bg-accent text-surface shadow-gold-glow"
+                    : "text-text-muted hover:text-text-primary"
+                }`}
+              >
+                {lang}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Real-time speech status pill */}
-        {isListening && (
-          <div className="flex items-center space-x-2 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs animate-pulse">
-            <span className="w-2 h-2 rounded-full bg-rose-500" />
-            <span>Listening... बोलिए</span>
-          </div>
-        )}
+        {/* AI Agent Panel Header with Gold Pulsing Dot */}
+        <div className="flex items-center space-x-2 px-3 py-1 rounded-full bg-base border border-white/[0.08] text-xs">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-accent shadow-gold-glow"></span>
+          </span>
+          <span className="text-text-muted text-[11px] font-medium">
+            {isParsing ? "Agent Parsing..." : isListening ? "Listening..." : "Agent Ready"}
+          </span>
+        </div>
       </div>
 
-      {/* Input Box with Embedded Mic & Action Button */}
+      {/* Large Input with Gold Glow on Focus & Mic Button */}
       <div className="relative">
-        <div className="flex items-center bg-gray-900/90 rounded-xl border border-gray-800 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all shadow-inner">
+        <div className="flex items-center bg-base rounded-2xl border border-white/[0.08] focus-within:border-accent focus-within:shadow-gold-glow transition-all">
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && parsed) {
-                handleCommitTransaction();
-              }
+              if (e.key === "Enter" && parsed) handleCommit();
             }}
-            placeholder='Type or tap mic: "2 kg sugar becha Ramesh ko 90 rs" / "Paid 500 rent"'
-            className="w-full bg-transparent px-4 py-3.5 text-sm sm:text-base text-gray-100 placeholder-gray-500 focus:outline-none"
+            placeholder='Type or speak: "2 kg sugar becha Ramesh ko 90 rs" or "5 liter tel vikla 750 rs"...'
+            className="w-full bg-transparent px-4 sm:px-6 py-4 text-base sm:text-lg text-text-primary placeholder:text-text-muted/40 focus:outline-none font-medium"
           />
 
-          <div className="flex items-center space-x-1.5 pr-2">
-            {/* Mic Button */}
-            <button
-              type="button"
-              onClick={toggleMic}
-              title={isListening ? "Stop listening" : "Start Indian voice dictation"}
-              className={`p-2.5 rounded-lg transition-all ${
-                isListening
-                  ? "bg-rose-600 text-white shadow-lg shadow-rose-600/40 animate-pulse scale-105"
-                  : "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white"
-              }`}
-            >
-              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4 text-indigo-400" />}
-            </button>
+          <div className="flex items-center space-x-2 pr-3">
+            {/* Waveform while speaking */}
+            {isListening && !shouldReduceMotion && (
+              <div className="hidden sm:flex items-center space-x-1 px-2">
+                {[0.4, 0.9, 0.6, 1, 0.5].map((scale, i) => (
+                  <motion.div
+                    key={i}
+                    animate={{ scaleY: [0.3, scale, 0.3] }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 0.6,
+                      delay: i * 0.1,
+                      ease: "easeInOut",
+                    }}
+                    className="w-1 h-6 bg-accent rounded-full origin-center"
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Mic button: Gold on navy with expanding ripple ring while listening */}
+            <div className="relative">
+              {isListening && (
+                <span className="animate-ping absolute inset-0 rounded-xl bg-accent opacity-60 pointer-events-none" />
+              )}
+              <button
+                type="button"
+                onClick={toggleMic}
+                title={isListening ? "Stop listening" : "Speak in regional language"}
+                className={`relative p-3 rounded-xl bg-surface border transition-all ${
+                  isListening
+                    ? "border-accent text-accent shadow-gold-glow scale-105"
+                    : "border-white/[0.08] text-accent hover:border-accent/40"
+                }`}
+              >
+                {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              </button>
+            </div>
 
             {/* Commit Button */}
-            <button
-              type="button"
-              onClick={handleCommitTransaction}
+            <Button
+              variant="primary"
+              size="md"
+              onClick={handleCommit}
               disabled={!parsed || isSubmitting}
-              className={`px-4 py-2.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center space-x-1.5 transition-all ${
-                parsed && !isSubmitting
-                  ? "bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-md shadow-indigo-600/30 cursor-pointer"
-                  : "bg-gray-800 text-gray-500 cursor-not-allowed"
-              }`}
+              isLoading={isSubmitting}
             >
-              {isSubmitting ? (
-                <RefreshCw className="w-4 h-4 animate-spin" />
-              ) : (
-                <>
-                  <span>Save</span>
-                  <Send className="w-3.5 h-3.5" />
-                </>
-              )}
-            </button>
+              Record
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Quick Example Prompt Pills */}
-      <div className="flex flex-wrap gap-1.5 mt-3">
-        <span className="text-[11px] text-gray-500 flex items-center pr-1">Try:</span>
-        {quickPills.map((pill, idx) => (
+      <div className="flex flex-wrap gap-2 mt-3.5">
+        <span className="text-[11px] text-text-muted flex items-center">Presets:</span>
+        {examplePills.map((pill, idx) => (
           <button
             key={idx}
             type="button"
-            onClick={() => setInputText(pill.label)}
-            className="text-[11px] px-2.5 py-1 rounded-lg bg-gray-900/60 hover:bg-indigo-600/15 border border-gray-800 hover:border-indigo-500/30 text-gray-300 hover:text-indigo-300 transition-colors"
+            onClick={() => {
+              setInputText(pill.label);
+              setSelectedLanguage(pill.lang as any);
+            }}
+            className="text-xs px-2.5 py-1 rounded-lg bg-base border border-white/[0.08] text-text-muted hover:text-accent hover:border-accent/30 transition-colors"
           >
             {pill.label}
           </button>
         ))}
       </div>
 
-      {/* Real-time Parsed Preview Card */}
+      {/* AI Live Typing / Streaming Interpretation Panel */}
       {parsed && (
-        <div className="mt-4 p-3.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 backdrop-blur-md">
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-indigo-500/20 text-xs">
-            <div className="flex items-center space-x-2 text-indigo-300 font-medium">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Parsed Understanding (AI Agent)</span>
+        <motion.div
+          initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+          animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          className="mt-4 p-4 rounded-xl bg-base border border-accent/30 shadow-gold-glow/50"
+        >
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/[0.08] text-xs">
+            <div className="flex items-center space-x-2 text-accent font-bold">
+              <Sparkles className="w-4 h-4 text-accent" />
+              <span>AI Agent Live Parse</span>
             </div>
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            <Badge variant="gold">
               Confidence {Math.round(parsed.confidence * 100)}%
-            </span>
+            </Badge>
           </div>
+
+          <p className="text-xs text-text-primary font-mono leading-relaxed mb-3">
+            {agentTypingText}
+            {!shouldReduceMotion && (
+              <span className="inline-block w-1.5 h-3.5 ml-1 bg-accent animate-pulse align-middle" />
+            )}
+          </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-            <div className="p-2 rounded-lg bg-gray-900/60 border border-gray-800/80">
-              <span className="text-[10px] text-gray-400 block">Action Type</span>
-              <span className="font-semibold capitalize text-indigo-300">
-                {parsed.action_type === "sale"
-                  ? "Sale (बिक्री)"
-                  : parsed.action_type === "stock_in"
-                  ? "Restock (माल आया)"
-                  : "Expense (खर्चा)"}
-              </span>
+            <div className="p-2 rounded-lg bg-surface border border-white/[0.08]">
+              <span className="text-[10px] text-text-muted block">Action</span>
+              <span className="font-bold text-accent uppercase">{parsed.action_type}</span>
             </div>
-
-            <div className="p-2 rounded-lg bg-gray-900/60 border border-gray-800/80">
-              <span className="text-[10px] text-gray-400 block">Product</span>
-              <span className="font-semibold text-gray-100 truncate block">
-                {parsed.product || "General Item"}
-              </span>
+            <div className="p-2 rounded-lg bg-surface border border-white/[0.08]">
+              <span className="text-[10px] text-text-muted block">Product</span>
+              <span className="font-semibold text-text-primary truncate block">{parsed.product}</span>
             </div>
-
-            <div className="p-2 rounded-lg bg-gray-900/60 border border-gray-800/80">
-              <span className="text-[10px] text-gray-400 block">Quantity</span>
-              <span className="font-semibold text-gray-100">
-                {parsed.quantity} {parsed.unit || "unit"}
-              </span>
+            <div className="p-2 rounded-lg bg-surface border border-white/[0.08]">
+              <span className="text-[10px] text-text-muted block">Quantity</span>
+              <span className="font-semibold text-text-primary">{parsed.quantity} {parsed.unit || "unit"}</span>
             </div>
-
-            <div className="p-2 rounded-lg bg-gray-900/60 border border-gray-800/80">
-              <span className="text-[10px] text-gray-400 block">Total Amount</span>
-              <span className="font-bold text-emerald-400">
-                ₹{(parsed.amount || 0).toFixed(2)}
-              </span>
+            <div className="p-2 rounded-lg bg-surface border border-white/[0.08]">
+              <span className="text-[10px] text-text-muted block">Key Amount</span>
+              <span className="font-bold text-accent">₹{(parsed.amount || 0).toFixed(2)}</span>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Success / Error Banners */}
-      {successMessage && (
-        <div className="mt-3 p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs flex items-center space-x-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
-          <span>{successMessage}</span>
-        </div>
-      )}
-
-      {errorMessage && (
-        <div className="mt-3 p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center space-x-2">
-          <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
-          <span>{errorMessage}</span>
-        </div>
+        </motion.div>
       )}
     </div>
   );

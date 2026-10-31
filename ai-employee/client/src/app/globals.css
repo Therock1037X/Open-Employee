@@ -3,55 +3,119 @@
 @tailwind utilities;
 
 :root {
-  --background: #090d16;
-  --foreground: #f3f4f6;
+  --bg-base: #000000;
+  --bg-surface: #14213D;
+  --accent: #FCA311;
+  --text-muted: #E5E5E5;
+  --text-primary: #FFFFFF;
+  --error: #EF4444;
+  --success: #10B981;
 }
 
 body {
-  color: var(--foreground);
-  background-color: var(--background);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-base);
+  background-image: 
+    radial-gradient(circle at 0% 0%, rgba(20, 33, 61, 0.5) 0%, transparent 45%),
+    radial-gradient(circle at 100% 0%, rgba(20, 33, 61, 0.4) 0%, transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(20, 33, 61, 0.5) 0%, transparent 45%),
+    radial-gradient(circle at 0% 100%, rgba(20, 33, 61, 0.4) 0%, transparent 45%);
+  background-attachment: fixed;
+  font-family: var(--font-inter), 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
-/* Glassmorphic card styling */
-.glass-card {
-  background: rgba(17, 24, 39, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+/* Typography Headings */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+/* Card, modal, sidebar style: navy #14213D with a 1px border in white at 8% opacity, rounded-2xl */
+.navy-card {
+  background-color: var(--bg-surface);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  border-radius: 1rem;
 }
 
-.glass-input {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  transition: all 0.2s ease-in-out;
+.navy-card-hover {
+  transition: all 0.2s ease-out;
+}
+.navy-card-hover:hover {
+  border-color: rgba(252, 163, 17, 0.3);
+  box-shadow: 0 10px 30px -10px rgba(252, 163, 17, 0.15);
 }
 
-.glass-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+/* Gold Button Lift and Glow */
+.btn-gold {
+  background-color: var(--accent);
+  color: var(--bg-surface);
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px -2px rgba(252, 163, 17, 0.45);
+}
+.btn-gold:active {
+  transform: scale(0.97);
+}
+
+/* Gold Focused Input */
+.gold-input-glow:focus {
   outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 20px -2px rgba(252, 163, 17, 0.35);
 }
 
-/* Subtle glow effects */
-.glow-primary {
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.25);
+/* Skeleton shimmer in navy */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, rgba(20, 33, 61, 0.8) 25%, rgba(30, 48, 88, 0.9) 50%, rgba(20, 33, 61, 0.8) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
 }
 
-/* Chrome DevTools and clean scrollbar */
+/* Animated gold border for card */
+@keyframes goldGradientBorder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.gold-gradient-border {
+  background: linear-gradient(60deg, #FCA311, #14213D, #FCA311, #14213D);
+  background-size: 300% 300%;
+  animation: goldGradientBorder 5s ease infinite;
+}
+
+/* Custom Scrollbar in theme tokens */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0f17;
+  background: var(--bg-base);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1f2937;
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+  background: var(--accent);
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

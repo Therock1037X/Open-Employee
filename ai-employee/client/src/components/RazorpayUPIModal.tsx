@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { QrCode, CheckCircle2, ShieldCheck, ArrowRight, RefreshCw, X, Smartphone, Copy, Check } from "lucide-react";
+import { QrCode, CheckCircle2, X, Smartphone, Copy, Check, RefreshCw } from "lucide-react";
 import { api, UPIOrder } from "@/lib/api";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { useToast } from "@/components/ui/Toast";
 
 interface RazorpayUPIModalProps {
   initialAmount?: number;
@@ -17,6 +20,7 @@ export function RazorpayUPIModal({
   onPaymentSuccess,
   onClose,
 }: RazorpayUPIModalProps) {
+  const { toast } = useToast();
   const [amount, setAmount] = useState(initialAmount.toString());
   const [customerName, setCustomerName] = useState(initialCustomer);
   const [note, setNote] = useState("Store Billing");
@@ -37,8 +41,9 @@ export function RazorpayUPIModal({
         note: note,
       });
       setActiveOrder(order);
+      toast("Generated Dynamic UPI QR Intent", "gold");
     } catch (err) {
-      console.error("UPI generation error:", err);
+      toast("Error creating UPI checkout", "error");
     } finally {
       setIsLoading(false);
     }
@@ -50,11 +55,12 @@ export function RazorpayUPIModal({
       setIsSimulating(true);
       const updated = await api.simulateUPISuccess(activeOrder.order_id);
       setActiveOrder(updated);
+      toast(`UPI Payment of ₹${activeOrder.amount.toFixed(2)} Received!`, "success");
       if (onPaymentSuccess) {
         onPaymentSuccess(updated);
       }
     } catch (err) {
-      console.error("Simulation error:", err);
+      toast("Simulation failed", "error");
     } finally {
       setIsSimulating(false);
     }
@@ -64,33 +70,32 @@ export function RazorpayUPIModal({
     if (activeOrder) {
       navigator.clipboard.writeText(activeOrder.upi_intent_url);
       setCopied(true);
+      toast("UPI Link Copied to Clipboard", "gold");
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
   return (
-    <div className="w-full glass-card rounded-2xl p-5 sm:p-6 border border-gray-800 shadow-2xl relative">
+    <div className="w-full bg-surface border border-white/[0.08] rounded-2xl p-6 shadow-2xl relative">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-gray-800">
+      <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
         <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
-            <QrCode className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-surface shadow-gold-glow">
+            <QrCode className="w-5 h-5 text-surface" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-bold text-gray-100 flex items-center space-x-2">
+            <h3 className="text-sm sm:text-base font-bold text-text-primary flex items-center space-x-2">
               <span>Razorpay Instant UPI Checkout</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-sky-500/15 text-sky-400 font-semibold uppercase">
-                Zero Gateway Fee
-              </span>
+              <Badge variant="gold">Zero Fee</Badge>
             </h3>
-            <p className="text-xs text-gray-400">Scan via GPay, PhonePe, Paytm, or BHIM UPI</p>
+            <p className="text-xs text-text-muted mt-0.5">Scan via GPay, PhonePe, Paytm, or BHIM UPI</p>
           </div>
         </div>
 
         {onClose && (
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+            className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-white/[0.05]"
           >
             <X className="w-4 h-4" />
           </button>
@@ -99,172 +104,168 @@ export function RazorpayUPIModal({
 
       {/* Main Content */}
       {!activeOrder ? (
-        // Order Creation Form
         <div className="mt-5 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-medium text-gray-300 block mb-1">Amount (₹ INR)</label>
+              <label className="text-xs font-semibold text-text-muted block mb-1">
+                Amount (₹ INR)
+              </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-2.5 text-gray-400 font-bold">₹</span>
+                <span className="absolute left-3.5 top-2.5 text-accent font-bold">₹</span>
                 <input
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="150"
-                  className="w-full pl-8 pr-3 py-2.5 rounded-xl bg-gray-900 border border-gray-800 text-sm text-gray-100 focus:outline-none focus:border-indigo-500 font-semibold"
+                  className="w-full pl-8 pr-3 py-2.5 rounded-xl bg-base border border-white/[0.08] text-sm text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow font-bold"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-medium text-gray-300 block mb-1">Customer Name</label>
+              <label className="text-xs font-semibold text-text-muted block mb-1">
+                Customer Name
+              </label>
               <input
                 type="text"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                placeholder="Walk-in Customer"
-                className="w-full px-3 py-2.5 rounded-xl bg-gray-900 border border-gray-800 text-sm text-gray-100 focus:outline-none focus:border-indigo-500"
+                placeholder="Customer"
+                className="w-full px-3 py-2.5 rounded-xl bg-base border border-white/[0.08] text-sm text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-medium text-gray-300 block mb-1">Payment Reference / Note</label>
+            <label className="text-xs font-semibold text-text-muted block mb-1">
+              Payment Note / Invoice Reference
+            </label>
             <input
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Store groceries purchase"
-              className="w-full px-3 py-2.5 rounded-xl bg-gray-900 border border-gray-800 text-sm text-gray-100 focus:outline-none focus:border-indigo-500"
+              placeholder="Store purchase billing"
+              className="w-full px-3 py-2.5 rounded-xl bg-base border border-white/[0.08] text-sm text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow"
             />
           </div>
 
-          <button
+          <Button
+            variant="primary"
+            size="lg"
             onClick={handleGenerateUPI}
             disabled={isLoading || !amount || parseFloat(amount) <= 0}
-            className="w-full mt-2 py-3 rounded-xl bg-gradient-to-r from-sky-600 via-indigo-600 to-violet-600 hover:from-sky-500 hover:to-violet-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/25 flex items-center justify-center space-x-2 transition-all"
+            isLoading={isLoading}
+            className="w-full"
+            icon={<QrCode className="w-4 h-4" />}
           >
-            {isLoading ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <>
-                <QrCode className="w-4 h-4" />
-                <span>Generate Dynamic UPI QR Code</span>
-              </>
-            )}
-          </button>
+            Generate Dynamic UPI QR Code
+          </Button>
         </div>
       ) : (
-        // Active UPI QR Display & Payment State
         <div className="mt-5 flex flex-col items-center">
           {activeOrder.status === "paid" ? (
-            // Success Screen
             <div className="py-8 flex flex-col items-center text-center space-y-3">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center shadow-lg shadow-emerald-500/20 animate-bounce">
+              <div className="w-16 h-16 rounded-full bg-success/20 text-success border border-success/40 flex items-center justify-center shadow-lg animate-bounce">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
-              <h4 className="text-lg font-bold text-gray-100">Payment Successfully Received!</h4>
-              <p className="text-sm text-gray-400">
+              <h4 className="text-lg font-bold text-text-primary">Payment Successfully Verified!</h4>
+              <p className="text-xs text-text-muted">
                 ₹{activeOrder.amount.toFixed(2)} received from {activeOrder.customer_name}.
               </p>
-              <div className="px-3 py-1.5 rounded-lg bg-gray-900 border border-gray-800 text-xs font-mono text-gray-300">
+              <div className="px-3 py-1.5 rounded-lg bg-base border border-white/[0.08] text-xs font-mono text-accent">
                 Order ID: {activeOrder.order_id}
               </div>
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => {
                   setActiveOrder(null);
                   setAmount("150");
                 }}
-                className="mt-4 px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-medium"
               >
                 Collect Another Payment
-              </button>
+              </Button>
             </div>
           ) : (
-            // QR Code Presentation
             <div className="w-full flex flex-col items-center space-y-4">
-              <div className="p-4 rounded-2xl bg-white shadow-2xl flex flex-col items-center relative group">
-                {/* SVG Rendered QR Code placeholder matching UPI standards */}
-                <svg className="w-48 h-48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {/* Outer corner squares */}
-                  <rect x="5" y="5" width="28" height="28" rx="4" fill="#090d16" />
+              {/* QR Code Presentation */}
+              <div className="p-4 rounded-2xl bg-white shadow-gold-glow flex flex-col items-center">
+                <svg className="w-44 h-44" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="5" y="5" width="28" height="28" rx="4" fill="#14213D" />
                   <rect x="9" y="9" width="20" height="20" rx="2" fill="white" />
-                  <rect x="13" y="13" width="12" height="12" rx="1" fill="#090d16" />
+                  <rect x="13" y="13" width="12" height="12" rx="1" fill="#14213D" />
 
-                  <rect x="67" y="5" width="28" height="28" rx="4" fill="#090d16" />
+                  <rect x="67" y="5" width="28" height="28" rx="4" fill="#14213D" />
                   <rect x="71" y="9" width="20" height="20" rx="2" fill="white" />
-                  <rect x="75" y="13" width="12" height="12" rx="1" fill="#090d16" />
+                  <rect x="75" y="13" width="12" height="12" rx="1" fill="#14213D" />
 
-                  <rect x="5" y="67" width="28" height="28" rx="4" fill="#090d16" />
+                  <rect x="5" y="67" width="28" height="28" rx="4" fill="#14213D" />
                   <rect x="9" y="71" width="20" height="20" rx="2" fill="white" />
-                  <rect x="13" y="75" width="12" height="12" rx="1" fill="#090d16" />
+                  <rect x="13" y="75" width="12" height="12" rx="1" fill="#14213D" />
 
-                  {/* QR Matrix Pattern Dots */}
-                  <rect x="37" y="8" width="5" height="5" fill="#090d16" />
-                  <rect x="47" y="8" width="6" height="5" fill="#090d16" />
-                  <rect x="57" y="8" width="5" height="5" fill="#090d16" />
-                  <rect x="37" y="18" width="7" height="6" fill="#090d16" />
-                  <rect x="48" y="18" width="5" height="5" fill="#090d16" />
-                  <rect x="37" y="28" width="5" height="5" fill="#090d16" />
-                  <rect x="57" y="28" width="6" height="6" fill="#090d16" />
+                  <rect x="37" y="8" width="5" height="5" fill="#14213D" />
+                  <rect x="47" y="8" width="6" height="5" fill="#14213D" />
+                  <rect x="57" y="8" width="5" height="5" fill="#14213D" />
+                  <rect x="37" y="18" width="7" height="6" fill="#14213D" />
+                  <rect x="48" y="18" width="5" height="5" fill="#14213D" />
+                  <rect x="37" y="28" width="5" height="5" fill="#14213D" />
+                  <rect x="57" y="28" width="6" height="6" fill="#14213D" />
 
-                  {/* Center branding dot */}
-                  <rect x="42" y="42" width="16" height="16" rx="4" fill="#4f46e5" />
-                  <circle cx="50" cy="50" r="4" fill="white" />
+                  <rect x="42" y="42" width="16" height="16" rx="4" fill="#FCA311" />
+                  <circle cx="50" cy="50" r="4" fill="#14213D" />
 
-                  {/* Bottom matrix patterns */}
-                  <rect x="37" y="67" width="6" height="6" fill="#090d16" />
-                  <rect x="48" y="67" width="8" height="5" fill="#090d16" />
-                  <rect x="62" y="67" width="6" height="7" fill="#090d16" />
-                  <rect x="74" y="67" width="5" height="5" fill="#090d16" />
-                  <rect x="85" y="67" width="6" height="6" fill="#090d16" />
-                  <rect x="37" y="78" width="6" height="6" fill="#090d16" />
-                  <rect x="50" y="78" width="8" height="6" fill="#090d16" />
-                  <rect x="67" y="78" width="6" height="6" fill="#090d16" />
-                  <rect x="80" y="78" width="7" height="6" fill="#090d16" />
-                  <rect x="37" y="89" width="8" height="6" fill="#090d16" />
-                  <rect x="52" y="89" width="6" height="6" fill="#090d16" />
-                  <rect x="67" y="89" width="6" height="6" fill="#090d16" />
-                  <rect x="80" y="89" width="6" height="6" fill="#090d16" />
+                  <rect x="37" y="67" width="6" height="6" fill="#14213D" />
+                  <rect x="48" y="67" width="8" height="5" fill="#14213D" />
+                  <rect x="62" y="67" width="6" height="7" fill="#14213D" />
+                  <rect x="74" y="67" width="5" height="5" fill="#14213D" />
+                  <rect x="85" y="67" width="6" height="6" fill="#14213D" />
+                  <rect x="37" y="78" width="6" height="6" fill="#14213D" />
+                  <rect x="50" y="78" width="8" height="6" fill="#14213D" />
+                  <rect x="67" y="78" width="6" height="6" fill="#14213D" />
+                  <rect x="80" y="78" width="7" height="6" fill="#14213D" />
+                  <rect x="37" y="89" width="8" height="6" fill="#14213D" />
+                  <rect x="52" y="89" width="6" height="6" fill="#14213D" />
+                  <rect x="67" y="89" width="6" height="6" fill="#14213D" />
+                  <rect x="80" y="89" width="6" height="6" fill="#14213D" />
                 </svg>
 
                 <div className="mt-2 text-center">
-                  <div className="text-xs font-bold text-gray-900 tracking-wider">₹{activeOrder.amount.toFixed(2)}</div>
-                  <div className="text-[10px] text-gray-500 font-mono">openemployee@icici</div>
+                  <div className="text-sm font-black text-surface tracking-wider">
+                    ₹{activeOrder.amount.toFixed(2)}
+                  </div>
+                  <div className="text-[10px] text-surface font-mono font-bold">openemployee@icici</div>
                 </div>
               </div>
 
-              {/* Status Indicator */}
-              <div className="flex items-center space-x-2 text-xs text-amber-400">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-                <span>Waiting for payment from customer...</span>
+              {/* Status */}
+              <div className="flex items-center space-x-2 text-xs text-accent">
+                <span className="w-2 h-2 rounded-full bg-accent animate-ping" />
+                <span className="font-medium">Waiting for customer to scan and pay...</span>
               </div>
 
-              {/* Quick Actions */}
-              <div className="w-full flex items-center justify-between gap-2 pt-2">
-                <button
+              {/* Action Buttons */}
+              <div className="w-full flex items-center justify-between gap-3 pt-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={copyUPIIntent}
-                  className="flex-1 py-2 px-3 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 text-xs text-gray-300 flex items-center justify-center space-x-1.5 transition-colors"
+                  className="flex-1"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-gray-400" />}
-                  <span>{copied ? "Copied UPI Link" : "Copy UPI Link"}</span>
-                </button>
+                  {copied ? <Check className="w-3.5 h-3.5 mr-1 text-success" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                  <span>{copied ? "Copied" : "Copy Link"}</span>
+                </Button>
 
-                <button
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={handleSimulatePayment}
                   disabled={isSimulating}
-                  className="flex-1 py-2 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-xs font-semibold text-emerald-300 flex items-center justify-center space-x-1.5 transition-colors"
-                  title="Test payment webhook without actual UPI transfer"
+                  isLoading={isSimulating}
+                  className="flex-1"
                 >
-                  {isSimulating ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <>
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Simulate Pay (Webhook)</span>
-                    </>
-                  )}
-                </button>
+                  <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                  <span>Simulate Pay</span>
+                </Button>
               </div>
             </div>
           )}

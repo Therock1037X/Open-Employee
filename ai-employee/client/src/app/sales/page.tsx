@@ -3,15 +3,22 @@
 import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { api, Sale } from "@/lib/api";
-import { TrendingUp, Plus, Search, Filter, Download, ArrowUpRight, CheckCircle2, User, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Modal } from "@/components/ui/Modal";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { useToast } from "@/components/ui/Toast";
+import { TrendingUp, Plus, Search } from "lucide-react";
 
 export default function SalesPage() {
+  const { toast } = useToast();
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
 
-  // New Sale Form State
+  // Form State
   const [product, setProduct] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [price, setPrice] = useState("");
@@ -44,15 +51,16 @@ export default function SalesPage() {
         price: parseFloat(price),
         unit,
         customer: customer || "Walk-in Customer",
-        lang: "en",
+        lang: "hi",
       });
+      toast(`Sale recorded for ${product}`, "success");
       setShowModal(false);
       setProduct("");
       setPrice("");
       setCustomer("");
       fetchSales();
     } catch (err) {
-      console.error(err);
+      toast("Failed to record sale", "error");
     }
   };
 
@@ -63,62 +71,61 @@ export default function SalesPage() {
       s.id.toLowerCase().includes(search.toLowerCase())
   );
 
-  const totalSalesVolume = sales.reduce((acc, s) => acc + s.total_amount, 0);
+  const totalVolume = sales.reduce((acc, s) => acc + s.total_amount, 0);
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-gray-100 flex flex-col">
+    <div className="min-h-screen bg-base text-text-primary flex flex-col">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Top Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-800">
-          <div>
-            <div className="flex items-center space-x-2.5">
-              <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                <TrendingUp className="w-5 h-5" />
-              </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Sales Management</h1>
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        {/* Banner */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-surface shadow-gold-glow">
+              <TrendingUp className="w-5 h-5 text-surface" />
             </div>
-            <p className="text-xs sm:text-sm text-gray-400 mt-1">
-              Real-time sales registry powered by AI voice/text parsing and UPI receipts.
-            </p>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-black text-text-primary tracking-tight">Sales Registry</h1>
+              <p className="text-xs text-text-muted mt-0.5">
+                Automated multi-channel sales and immediate stock balance deductions.
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <div className="text-right pr-2">
-              <span className="text-[11px] text-gray-400 block">Total Revenue</span>
-              <span className="text-lg font-bold text-emerald-400">₹{totalSalesVolume.toFixed(2)}</span>
+          <div className="flex items-center space-x-4">
+            <div className="text-right">
+              <span className="text-[11px] text-text-muted block">Total Gross Revenue</span>
+              <AnimatedNumber value={totalVolume} prefix="₹" decimals={2} className="text-xl" isGold />
             </div>
-            <button
+            <Button
+              variant="primary"
+              size="md"
               onClick={() => setShowModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-600/20 flex items-center space-x-1.5 transition-all"
+              icon={<Plus className="w-4 h-4" />}
             >
-              <Plus className="w-4 h-4" />
-              <span>Record Sale</span>
-            </button>
+              Record Sale
+            </Button>
           </div>
         </div>
 
         {/* Filter Bar */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 absolute left-3.5 top-3 text-gray-500" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by customer, product, or sale ID..."
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-gray-900 border border-gray-800 text-xs sm:text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500"
-            />
-          </div>
+        <div className="relative max-w-md">
+          <Search className="w-4 h-4 absolute left-3.5 top-3 text-text-muted" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search invoice, customer, or product..."
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface border border-white/[0.08] text-xs sm:text-sm text-text-primary placeholder:text-text-muted/40 focus:outline-none focus:border-accent focus:shadow-gold-glow"
+          />
         </div>
 
-        {/* Sales Table */}
-        <div className="glass-card rounded-2xl border border-gray-800 overflow-hidden shadow-2xl">
+        {/* Sales Table Card */}
+        <Card className="overflow-hidden p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
               <thead>
-                <tr className="border-b border-gray-800 text-gray-400 text-[11px] uppercase tracking-wider bg-gray-900/40">
+                <tr className="border-b border-white/[0.08] text-text-muted text-[11px] uppercase tracking-wider bg-base/50">
                   <th className="py-3 px-4">Invoice / ID</th>
                   <th className="py-3 px-4">Product</th>
                   <th className="py-3 px-4">Quantity</th>
@@ -128,116 +135,110 @@ export default function SalesPage() {
                   <th className="py-3 px-4">Time</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800/60">
-                {filteredSales.map((s) => (
-                  <tr key={s.id} className="hover:bg-gray-800/40 transition-colors">
-                    <td className="py-3.5 px-4 font-mono text-xs text-indigo-400 font-semibold">{s.id}</td>
-                    <td className="py-3.5 px-4 font-semibold text-gray-100">{s.product}</td>
-                    <td className="py-3.5 px-4 text-gray-300">
+              <tbody className="divide-y divide-white/[0.06]">
+                {filteredSales.map((s, idx) => (
+                  <tr key={s.id} className="hover:bg-white/[0.03] transition-colors">
+                    <td className="py-3.5 px-4 font-mono text-xs text-accent font-bold">{s.id}</td>
+                    <td className="py-3.5 px-4 font-semibold text-text-primary">{s.product}</td>
+                    <td className="py-3.5 px-4 text-text-muted">
                       {s.quantity} {s.unit}
                     </td>
-                    <td className="py-3.5 px-4 text-gray-400">₹{s.price.toFixed(2)}</td>
-                    <td className="py-3.5 px-4 font-bold text-emerald-400">₹{s.total_amount.toFixed(2)}</td>
-                    <td className="py-3.5 px-4 text-gray-300">{s.customer}</td>
-                    <td className="py-3.5 px-4 text-gray-500 text-xs font-mono">
-                      {new Date(s.created_at).toLocaleString([], { dateStyle: "short", timeStyle: "short" })}
+                    <td className="py-3.5 px-4 text-text-muted">₹{s.price.toFixed(2)}</td>
+                    <td className="py-3.5 px-4 font-mono font-bold text-accent">
+                      ₹{s.total_amount.toFixed(2)}
+                    </td>
+                    <td className="py-3.5 px-4 text-text-muted">{s.customer}</td>
+                    <td className="py-3.5 px-4 text-text-muted/60 text-xs font-mono">
+                      {new Date(s.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
 
-        {/* Create Sale Modal */}
-        {showModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-            <div className="w-full max-w-md glass-card rounded-2xl p-6 border border-gray-800 shadow-2xl">
-              <h3 className="text-base font-bold text-white mb-4">Record New Sale</h3>
-              <form onSubmit={handleCreateSale} className="space-y-4 text-xs sm:text-sm">
-                <div>
-                  <label className="text-xs font-medium text-gray-300 block mb-1">Product Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={product}
-                    onChange={(e) => setProduct(e.target.value)}
-                    placeholder="e.g. Sugar (चीनी)"
-                    className="w-full px-3 py-2 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 focus:outline-none focus:border-indigo-500"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-gray-300 block mb-1">Quantity</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      required
-                      value={quantity}
-                      onChange={(e) => setQuantity(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 focus:outline-none focus:border-indigo-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-300 block mb-1">Unit</label>
-                    <select
-                      value={unit}
-                      onChange={(e) => setUnit(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 focus:outline-none focus:border-indigo-500"
-                    >
-                      <option value="kg">kg</option>
-                      <option value="L">L</option>
-                      <option value="packet">packet</option>
-                      <option value="piece">piece</option>
-                      <option value="box">box</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-medium text-gray-300 block mb-1">Price per Unit (₹)</label>
-                  <input
-                    type="number"
-                    step="0.5"
-                    required
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="45"
-                    className="w-full px-3 py-2 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 focus:outline-none focus:border-indigo-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-medium text-gray-300 block mb-1">Customer Name (Optional)</label>
-                  <input
-                    type="text"
-                    value={customer}
-                    onChange={(e) => setCustomer(e.target.value)}
-                    placeholder="Walk-in Customer"
-                    className="w-full px-3 py-2 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 focus:outline-none focus:border-indigo-500"
-                  />
-                </div>
-
-                <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-800">
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    className="px-4 py-2 rounded-xl bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-medium"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
-                  >
-                    Save & Deduct Stock
-                  </button>
-                </div>
-              </form>
+        {/* Modal */}
+        <Modal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          title="Record New Sale"
+          description="Log item sold; inventory will automatically deplete and finance ledger will credit."
+        >
+          <form onSubmit={handleCreateSale} className="space-y-4 text-xs sm:text-sm">
+            <div>
+              <label className="text-xs font-semibold text-text-muted block mb-1">Product</label>
+              <input
+                type="text"
+                required
+                value={product}
+                onChange={(e) => setProduct(e.target.value)}
+                placeholder="e.g. Sugar (चीनी)"
+                className="w-full px-3 py-2 rounded-xl bg-base border border-white/[0.08] text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow"
+              />
             </div>
-          </div>
-        )}
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-semibold text-text-muted block mb-1">Quantity</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  required
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-base border border-white/[0.08] text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-text-muted block mb-1">Unit</label>
+                <select
+                  value={unit}
+                  onChange={(e) => setUnit(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-base border border-white/[0.08] text-text-primary focus:outline-none focus:border-accent"
+                >
+                  <option value="kg">kg</option>
+                  <option value="L">L</option>
+                  <option value="packet">packet</option>
+                  <option value="piece">piece</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-text-muted block mb-1">Price per Unit (₹)</label>
+              <input
+                type="number"
+                step="0.5"
+                required
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="45"
+                className="w-full px-3 py-2 rounded-xl bg-base border border-white/[0.08] text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-text-muted block mb-1">Customer</label>
+              <input
+                type="text"
+                value={customer}
+                onChange={(e) => setCustomer(e.target.value)}
+                placeholder="Walk-in Customer"
+                className="w-full px-3 py-2 rounded-xl bg-base border border-white/[0.08] text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow"
+              />
+            </div>
+
+            <div className="flex items-center justify-end space-x-3 pt-3 border-t border-white/[0.08]">
+              <Button type="button" variant="secondary" size="sm" onClick={() => setShowModal(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary" size="sm">
+                Save & Deduct Stock
+              </Button>
+            </div>
+          </form>
+        </Modal>
       </main>
     </div>
   );
