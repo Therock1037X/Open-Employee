@@ -1,0 +1,17 @@
+# Replace with real GitHub usernames
+/client/                                   @user1
+/server/app/api/business.py                @user1
+/server/app/modules/business/              @user1
+/server/app/core/                          @user2
+/server/app/schemas/                       @user2
+/server/app/workers/                       @user2
+/server/migrations/                        @user2
+/server/app/modules/agent/                 @user2
+/server/app/modules/forecasting/           @user2
+/server/app/modules/computer_use/          @user2
+/mock-portal/                              @user2
+/server/app/modules/integrations/          @user3
+/server/app/api/integrations.py            @user3
+/server/app/modules/voice/                 @user4
+/server/app/modules/memory/                @user4
+/server/app/modules/audit/                 @user4
