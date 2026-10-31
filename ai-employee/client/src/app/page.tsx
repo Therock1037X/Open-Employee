@@ -1,24 +1,42 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
 import { AuthCard } from "@/components/AuthCard";
-import { Sparkles, Bot, Shield, PhoneCall, TrendingUp } from "lucide-react";
+import { Sparkles, Bot, Shield, PhoneCall, TrendingUp, ArrowRight } from "lucide-react";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-between p-4 sm:p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/40 via-[#090d16] to-[#090d16]">
+    <main className="min-h-screen flex flex-col items-center justify-between p-4 sm:p-8 bg-base">
       {/* Top Brand Bar */}
-      <header className="w-full max-w-5xl flex items-center justify-between py-4 border-b border-gray-800/60 mb-8">
+      <header className="w-full max-w-5xl flex items-center justify-between py-4 border-b border-white/[0.08] mb-8">
         <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-600/30">
-            <Bot className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-surface shadow-gold-glow">
+            <Bot className="w-5 h-5 text-surface" />
           </div>
           <div>
-            <h1 className="text-base font-bold text-gray-100 tracking-tight">Open Employee</h1>
-            <p className="text-[11px] text-gray-400">Autonomous AI Employee for Indian MSMEs</p>
+            <h1 className="text-base font-bold text-text-primary tracking-tight">Open Employee</h1>
+            <p className="text-[11px] text-text-muted">Always-on AI Employee for Indian MSMEs</p>
           </div>
         </div>
 
-        <div className="hidden sm:flex items-center space-x-2 text-xs text-gray-400">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Agent Online</span>
+        <div className="flex items-center space-x-3">
+          <div className="hidden sm:flex items-center space-x-2 text-xs text-text-muted">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent shadow-gold-glow"></span>
+            </span>
+            <span>Agent Active 24/7</span>
+          </div>
+
+          <Link href="/dashboard">
+            <Button variant="secondary" size="sm">
+              Dashboard &rarr;
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -26,53 +44,61 @@ export default function HomePage() {
       <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto">
         {/* Left Column: Value Proposition */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium">
-            <Sparkles className="w-4 h-4" />
-            <span>Multilingual AI Operations Platform</span>
-          </div>
+          <Badge variant="gold">
+            <Sparkles className="w-3.5 h-3.5 mr-1" />
+            <span>Black & Gold Elegance</span>
+          </Badge>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-text-primary tracking-tight leading-tight">
             Your 24/7 AI employee that works even after the shop shuts.
           </h2>
 
-          <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
-            Speak or type in Hinglish or regional languages. Automatically updates sales and stock,
-            forecasts inventory, places voice calls to suppliers, and manages GST filings through Playwright automation.
+          <p className="text-text-muted text-sm sm:text-base leading-relaxed">
+            Speak or type in Hinglish, Marathi, Hindi, or English. Automatically tracks sales & inventory,
+            forecasts stock reorders, generates multi-channel marketing campaigns, places outbound supplier voice calls, and collects instant Razorpay UPI.
           </p>
 
           {/* Feature Highlights Grid */}
-          <div className="grid grid-cols-2 gap-3 pt-2">
-            <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center space-x-3">
-              <PhoneCall className="w-5 h-5 text-indigo-400 shrink-0" />
-              <div>
-                <h4 className="text-xs font-semibold text-gray-200">Indian-Language Calls</h4>
-                <p className="text-[11px] text-gray-500">Bhashini + Exotel telephony</p>
+          <div className="grid grid-cols-2 gap-3.5 pt-2">
+            <Card className="p-4 flex items-center space-x-3" hoverEffect>
+              <div className="p-2 rounded-xl bg-accent/15 text-accent border border-accent/30">
+                <PhoneCall className="w-4 h-4 text-accent" />
               </div>
-            </div>
+              <div>
+                <h4 className="text-xs font-bold text-text-primary">Voice Telephony</h4>
+                <p className="text-[11px] text-text-muted">Bhashini + Exotel</p>
+              </div>
+            </Card>
 
-            <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center space-x-3">
-              <TrendingUp className="w-5 h-5 text-indigo-400 shrink-0" />
-              <div>
-                <h4 className="text-xs font-semibold text-gray-200">Stock & Finance</h4>
-                <p className="text-[11px] text-gray-500">Razorpay UPI & predictions</p>
+            <Card className="p-4 flex items-center space-x-3" hoverEffect>
+              <div className="p-2 rounded-xl bg-accent/15 text-accent border border-accent/30">
+                <TrendingUp className="w-4 h-4 text-accent" />
               </div>
-            </div>
+              <div>
+                <h4 className="text-xs font-bold text-text-primary">Stock & UPI</h4>
+                <p className="text-[11px] text-text-muted">Instant Dynamic QR</p>
+              </div>
+            </Card>
 
-            <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center space-x-3">
-              <Shield className="w-5 h-5 text-emerald-400 shrink-0" />
-              <div>
-                <h4 className="text-xs font-semibold text-gray-200">Approval Gate</h4>
-                <p className="text-[11px] text-gray-500">Human audit for every payment</p>
+            <Card className="p-4 flex items-center space-x-3" hoverEffect>
+              <div className="p-2 rounded-xl bg-accent/15 text-accent border border-accent/30">
+                <Shield className="w-4 h-4 text-accent" />
               </div>
-            </div>
+              <div>
+                <h4 className="text-xs font-bold text-text-primary">Approval Gate</h4>
+                <p className="text-[11px] text-text-muted">Human Sign-off</p>
+              </div>
+            </Card>
 
-            <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center space-x-3">
-              <Bot className="w-5 h-5 text-violet-400 shrink-0" />
-              <div>
-                <h4 className="text-xs font-semibold text-gray-200">Computer Use</h4>
-                <p className="text-[11px] text-gray-500">GST mock portal automation</p>
+            <Card className="p-4 flex items-center space-x-3" hoverEffect>
+              <div className="p-2 rounded-xl bg-accent/15 text-accent border border-accent/30">
+                <Bot className="w-4 h-4 text-accent" />
               </div>
-            </div>
+              <div>
+                <h4 className="text-xs font-bold text-text-primary">Computer Use</h4>
+                <p className="text-[11px] text-text-muted">Playwright Mock GST</p>
+              </div>
+            </Card>
           </div>
         </div>
 
@@ -83,7 +109,7 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <footer className="w-full max-w-5xl py-6 mt-8 border-t border-gray-900 text-center text-xs text-gray-600">
+      <footer className="w-full max-w-5xl py-6 mt-8 border-t border-white/[0.08] text-center text-xs text-text-muted/60">
         Open Employee Platform &copy; 2026. Empowering Indian small businesses with autonomous AI workers.
       </footer>
     </main>
