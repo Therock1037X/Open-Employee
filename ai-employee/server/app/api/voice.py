@@ -6,6 +6,8 @@ from app.modules.voice.nmt.client import bhashini_nmt
 from app.modules.voice.tts.client import bhashini_tts
 from app.modules.voice.telephony.client import exotel_client
 
+from app.modules.voice.bhashini_service import bhashini_service
+
 router = APIRouter(prefix="/voice", tags=["voice"])
 
 
@@ -15,6 +17,7 @@ def ping():
         "module": "voice",
         "status": "online",
         "providers": ["bhashini_asr", "bhashini_nmt", "bhashini_tts", "exotel_telephony"],
+        "bhashini_live_configured": bhashini_service.has_credentials(),
     }
 
 

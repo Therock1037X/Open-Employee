@@ -1,8 +1,19 @@
 import os
+from pathlib import Path
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
-load_dotenv()
+# Search and load .env across server and root directories
+_current_dir = Path(__file__).resolve().parent
+_env_candidates = [
+    _current_dir.parent.parent / ".env",          # ai-employee/server/.env
+    _current_dir.parent.parent.parent / ".env",   # ai-employee/.env
+    Path.cwd() / ".env",
+]
+
+for env_path in _env_candidates:
+    if env_path.exists():
+        load_dotenv(dotenv_path=env_path, override=False)
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Open Employee API"
@@ -16,13 +27,25 @@ class Settings(BaseSettings):
     FIREBASE_PROJECT_ID: str = os.getenv("FIREBASE_PROJECT_ID", "openemployee-1037x")
     FIREBASE_CREDENTIALS_PATH: str | None = os.getenv("FIREBASE_CREDENTIALS_PATH", None)
 
-    # External APIs
+    # Bhashini (Government of India AI Speech & Translation Platform)
     BHASHINI_USER_ID: str | None = os.getenv("BHASHINI_USER_ID")
     BHASHINI_API_KEY: str | None = os.getenv("BHASHINI_API_KEY")
     BHASHINI_INFERENCE_KEY: str | None = os.getenv("BHASHINI_INFERENCE_KEY")
+    BHASHINI_PIPELINE_URL: str = os.getenv(
+        "BHASHINI_PIPELINE_URL",
+        "https://dhruva-api.bhashini.gov.in/services/inference/pipeline"
+    )
+    BHASHINI_CONFIG_URL: str = os.getenv(
+        "BHASHINI_CONFIG_URL",
+        "https://meity-auth.ulcacontrib.org/ulca/apis/v0/model/getModelsPipeline"
+    )
+
+    # Exotel Telephony
     EXOTEL_SID: str | None = os.getenv("EXOTEL_SID")
     EXOTEL_API_KEY: str | None = os.getenv("EXOTEL_API_KEY")
     EXOTEL_API_TOKEN: str | None = os.getenv("EXOTEL_API_TOKEN")
+
+    # Payments & Integrations
     RAZORPAY_KEY_ID: str | None = os.getenv("RAZORPAY_KEY_ID")
     RAZORPAY_KEY_SECRET: str | None = os.getenv("RAZORPAY_KEY_SECRET")
     WHATSAPP_TOKEN: str | None = os.getenv("WHATSAPP_TOKEN")

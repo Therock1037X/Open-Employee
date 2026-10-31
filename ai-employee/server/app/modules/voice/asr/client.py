@@ -1,4 +1,5 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any
+from app.modules.voice.bhashini_service import bhashini_service
 
 class BhashiniASRClient:
     """
@@ -7,19 +8,6 @@ class BhashiniASRClient:
     """
 
     async def transcribe_audio(self, audio_data: str, source_lang: str = "hi") -> Dict[str, Any]:
-        # Simulated transcription fallback if Bhashini credentials not set
-        sample_transcripts = {
-            "hi": "2 kg chini becha Ramesh bhai ko 90 rupaye",
-            "en": "sold 5 kg rice to customer for 250 rs",
-            "ta": "ரமேஷுக்கு 2 கிலோ சர்க்கரை 90 ரூபாய்க்கு விற்றேன்",
-            "mr": "रमेशला २ किलो साखर ९० रुपयात विकली",
-        }
-        text = sample_transcripts.get(source_lang, sample_transcripts["hi"])
-        return {
-            "transcribed_text": text,
-            "source_lang": source_lang,
-            "confidence": 0.94,
-            "engine": "Bhashini ASR (Indian Languages)",
-        }
+        return await bhashini_service.run_asr(audio_content_base64=audio_data, lang=source_lang)
 
 bhashini_asr = BhashiniASRClient()

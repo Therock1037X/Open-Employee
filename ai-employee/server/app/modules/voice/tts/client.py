@@ -1,4 +1,5 @@
 from typing import Dict, Any
+from app.modules.voice.bhashini_service import bhashini_service
 
 class BhashiniTTSClient:
     """
@@ -6,15 +7,7 @@ class BhashiniTTSClient:
     Synthesizes natural Indian accent speech in 14+ Indian languages.
     """
 
-    async def synthesize_speech(self, text: str, lang: str = "hi") -> Dict[str, Any]:
-        return {
-            "status": "SYNTHESIZED",
-            "lang": lang,
-            "text": text,
-            "audio_format": "wav",
-            "audio_duration_seconds": 3.8,
-            "sample_audio_url": "https://cdn.openemployee.local/audio/synthesized_hi.wav",
-            "engine": "Bhashini TTS (Voice Engine)",
-        }
+    async def synthesize_speech(self, text: str, lang: str = "hi", gender: str = "female") -> Dict[str, Any]:
+        return await bhashini_service.run_tts(text=text, lang=lang, gender=gender)
 
 bhashini_tts = BhashiniTTSClient()
