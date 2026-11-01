@@ -28,32 +28,38 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const shouldReduceMotion = useReducedMotion();
 
     const sizeStyles = {
-      sm: "px-3 py-1.5 text-xs rounded-xl",
-      md: "px-4 py-2.5 text-sm rounded-xl",
-      lg: "px-6 py-3.5 text-base rounded-2xl",
+      sm: "px-3.5 py-1.5 text-xs rounded-xl",
+      md: "px-5 py-2.5 text-sm rounded-xl font-bold",
+      lg: "px-6 py-3.5 text-base rounded-xl font-bold",
     }[size];
 
     const variantStyles = {
+      // Primary: Teal with crisp white text
       primary:
-        "bg-accent text-surface font-bold hover:shadow-gold-glow hover:-translate-y-0.5 active:scale-[0.97]",
+        "bg-teal text-white font-bold hover:opacity-95 shadow-xs disabled:bg-card-border/70 disabled:text-secondary-text disabled:border disabled:border-card-border disabled:opacity-80",
+      // Secondary: Card background, primary text, thin border, hover subtle highlight
       secondary:
-        "bg-surface text-text-primary border border-white/[0.08] hover:border-accent/40 hover:-translate-y-0.5 active:scale-[0.97]",
+        "bg-card text-primary-text border border-card-border font-semibold hover:bg-highlight/40 dark:hover:bg-teal/20",
+      // Outline: Teal border and text
       outline:
-        "bg-transparent text-accent border border-accent hover:bg-accent/10 active:scale-[0.97]",
+        "bg-transparent text-teal dark:text-skyblue border border-teal dark:border-skyblue font-semibold hover:bg-teal/10",
+      // Danger: Red
       danger:
-        "bg-error/20 text-error border border-error/30 hover:bg-error/30 active:scale-[0.97]",
+        "bg-error/15 text-error border border-error/30 font-bold hover:bg-error/25",
+      // Success: Green
       success:
-        "bg-success/20 text-success border border-success/30 hover:bg-success/30 active:scale-[0.97]",
+        "bg-success/15 text-success border border-success/30 font-bold hover:bg-success/25",
+      // Ghost
       ghost:
-        "bg-transparent text-text-muted hover:text-text-primary hover:bg-surface/60",
+        "bg-transparent text-secondary-text hover:text-primary-text hover:bg-highlight/30 dark:hover:bg-teal/20 font-semibold",
     }[variant];
 
     const motionProps = shouldReduceMotion
       ? {}
       : {
-          whileHover: disabled || isLoading ? {} : { y: -2 },
-          whileTap: disabled || isLoading ? {} : { scale: 0.97 },
-          transition: { type: "spring", stiffness: 400, damping: 25 },
+          whileHover: disabled || isLoading ? {} : { y: -1 },
+          whileTap: disabled || isLoading ? {} : { scale: 0.98 },
+          transition: { type: "spring", stiffness: 450, damping: 25 },
         };
 
     return (
@@ -61,8 +67,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         {...motionProps}
-        className={`inline-flex items-center justify-center font-medium transition-colors select-none ${sizeStyles} ${variantStyles} ${
-          disabled || isLoading ? "opacity-50 cursor-not-allowed transform-none" : "cursor-pointer"
+        className={`inline-flex items-center justify-center transition-colors select-none ${sizeStyles} ${variantStyles} ${
+          disabled || isLoading ? "cursor-not-allowed transform-none" : "cursor-pointer"
         } ${className}`}
         {...(props as any)}
       >
@@ -88,7 +94,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             />
           </svg>
         )}
-        {!isLoading && icon && <span className="mr-2 inline-flex">{icon}</span>}
+        {!isLoading && icon && <span className="mr-2 inline-flex items-center">{icon}</span>}
         <span>{children}</span>
       </motion.button>
     );

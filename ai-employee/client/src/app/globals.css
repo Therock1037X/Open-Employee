@@ -3,119 +3,287 @@
 @tailwind utilities;
 
 :root {
-  --bg-base: #000000;
-  --bg-surface: #14213D;
-  --accent: #FCA311;
-  --text-muted: #E5E5E5;
-  --text-primary: #FFFFFF;
+  /* Palette Constants */
+  --palette-navy: #2F4156;
+  --palette-navy-dark: #1B2735;
+  --palette-teal: #567C8D;
+  --palette-teal-dark: #3F5E6E;
+  --palette-teal-light: #6E95A6;
+  --palette-skyblue: #C8D9E6;
+  --palette-skyblue-bright: #DCE8F2;
+  --palette-beige: #F5EFEB;
+  --palette-white: #FFFFFF;
+  --palette-error: #EF4444;
+  --palette-success: #10B981;
+
+  /* Light Theme Mappings (High-Contrast & WCAG AAA) */
+  --bg-page: #F5EFEB;
+  --bg-card: #FFFFFF;
+  --bg-navbar: rgba(255, 255, 255, 0.96);
+  --bg-modal: #FFFFFF;
+  --border-card: #C8D9E6;
+  --border-strong: #A9C2D4;
+  --text-primary: #2F4156;         /* Navy - Bold and crystal clear */
+  --text-secondary: #3D5A6A;       /* High-contrast Teal (6.2:1 on White/Beige) */
+  --accent-text: #2F4156;          /* Deep Navy for KPI numbers and critical metrics */
+  --primary-btn: #567C8D;          /* Teal */
+  --primary-btn-text: #FFFFFF;     /* White text */
+  --highlight: #C8D9E6;
+  --highlight-hover: rgba(200, 217, 230, 0.45);
+  --chip-bg: #FFFFFF;
+  --chip-text: #2F4156;
+  --chip-border: #C8D9E6;
   --error: #EF4444;
   --success: #10B981;
+
+  --shadow-card: 0 4px 16px -2px rgba(47, 65, 86, 0.08), 0 2px 6px -1px rgba(47, 65, 86, 0.04);
+  --shadow-card-hover: 0 10px 28px -4px rgba(47, 65, 86, 0.12);
 }
 
+.dark {
+  /* Dark Theme Mappings (High-Contrast & WCAG AAA) */
+  --bg-page: #1B2735;              /* Deep Midnight Navy */
+  --bg-card: #2F4156;              /* Slate Navy Card */
+  --bg-navbar: rgba(47, 65, 86, 0.96);
+  --bg-modal: #2F4156;
+  --border-card: rgba(86, 124, 141, 0.35); /* Elegant Teal boundary */
+  --border-strong: rgba(200, 217, 230, 0.35);
+  --text-primary: #FFFFFF;         /* Pure crisp White */
+  --text-secondary: #D2E3F0;       /* Luminous Sky Blue (9.1:1 on Navy) */
+  --accent-text: #FFFFFF;          /* Pure White for KPI numbers in dark mode */
+  --primary-btn: #567C8D;          /* Teal */
+  --primary-btn-text: #FFFFFF;     /* White text */
+  --highlight: rgba(86, 124, 141, 0.25);
+  --highlight-hover: rgba(86, 124, 141, 0.35);
+  --chip-bg: #1B2735;
+  --chip-text: #FFFFFF;
+  --chip-border: rgba(86, 124, 141, 0.5);
+  --error: #EF4444;
+  --success: #10B981;
+
+  --shadow-card: 0 6px 20px -3px rgba(0, 0, 0, 0.35), 0 3px 8px -2px rgba(0, 0, 0, 0.25);
+  --shadow-card-hover: 0 12px 32px -4px rgba(0, 0, 0, 0.5);
+}
+
+/* Base Body Styles */
 body {
   color: var(--text-primary);
-  background-color: var(--bg-base);
-  background-image: 
-    radial-gradient(circle at 0% 0%, rgba(20, 33, 61, 0.5) 0%, transparent 45%),
-    radial-gradient(circle at 100% 0%, rgba(20, 33, 61, 0.4) 0%, transparent 45%),
-    radial-gradient(circle at 100% 100%, rgba(20, 33, 61, 0.5) 0%, transparent 45%),
-    radial-gradient(circle at 0% 100%, rgba(20, 33, 61, 0.4) 0%, transparent 45%);
-  background-attachment: fixed;
+  background-color: var(--bg-page);
   font-family: var(--font-inter), 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Typography Headings */
+/* Smooth 200ms color transition when switching themes */
+body, 
+header, 
+nav, 
+main, 
+section, 
+article, 
+aside, 
+footer,
+.theme-transition {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Headings Typography */
 h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.025em;
   font-weight: 700;
+  color: var(--text-primary);
 }
 
-/* Card, modal, sidebar style: navy #14213D with a 1px border in white at 8% opacity, rounded-2xl */
-.navy-card {
-  background-color: var(--bg-surface);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1rem;
+/* Themed Card Utilities */
+.app-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 0.75rem; /* rounded-xl */
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 
-.navy-card-hover {
-  transition: all 0.2s ease-out;
-}
-.navy-card-hover:hover {
-  border-color: rgba(252, 163, 17, 0.3);
-  box-shadow: 0 10px 30px -10px rgba(252, 163, 17, 0.15);
+.app-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--border-strong);
 }
 
-/* Gold Button Lift and Glow */
-.btn-gold {
-  background-color: var(--accent);
-  color: var(--bg-surface);
+/* Preset Pill Chip Style */
+.preset-chip {
+  background-color: var(--chip-bg);
+  color: var(--chip-text);
+  border: 1px solid var(--chip-border);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.6rem;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.preset-chip:hover {
+  border-color: var(--palette-teal);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px -2px rgba(86, 124, 141, 0.2);
+}
+
+/* Primary Button Styling */
+.btn-primary {
+  background-color: var(--primary-btn);
+  color: var(--primary-btn-text);
   font-weight: 600;
   border-radius: 0.75rem;
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-}
-.btn-gold:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 20px -2px rgba(252, 163, 17, 0.45);
-}
-.btn-gold:active {
-  transform: scale(0.97);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px -1px rgba(86, 124, 141, 0.35);
+  transition: transform 0.15s ease, opacity 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Gold Focused Input */
-.gold-input-glow:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 20px -2px rgba(252, 163, 17, 0.35);
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px -2px rgba(86, 124, 141, 0.45);
 }
 
-/* Skeleton shimmer in navy */
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* Secondary Button Styling */
+.btn-secondary {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-card);
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  border-color: var(--palette-teal);
+  background-color: var(--highlight);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+/* Input Placeholder: Crisp & High Contrast in both modes */
+::placeholder {
+  color: var(--text-secondary) !important;
+  opacity: 0.75 !important;
+}
+
+/* Skeleton shimmer: adapts across Light & Dark themes */
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
+
 .skeleton-shimmer {
-  background: linear-gradient(90deg, rgba(20, 33, 61, 0.8) 25%, rgba(30, 48, 88, 0.9) 50%, rgba(20, 33, 61, 0.8) 75%);
+  background: linear-gradient(
+    90deg,
+    rgba(200, 217, 230, 0.35) 25%,
+    rgba(200, 217, 230, 0.75) 50%,
+    rgba(200, 217, 230, 0.35) 75%
+  );
   background-size: 200% 100%;
-  animation: shimmer 1.6s infinite;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.75rem;
 }
 
-/* Animated gold border for card */
-@keyframes goldGradientBorder {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-.gold-gradient-border {
-  background: linear-gradient(60deg, #FCA311, #14213D, #FCA311, #14213D);
-  background-size: 300% 300%;
-  animation: goldGradientBorder 5s ease infinite;
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(86, 124, 141, 0.25) 25%,
+    rgba(86, 124, 141, 0.5) 50%,
+    rgba(86, 124, 141, 0.25) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
 
-/* Custom Scrollbar in theme tokens */
+/* Mic Button soft ripple only while listening */
+@keyframes softRipple {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+.mic-ripple-ring {
+  animation: softRipple 1.8s cubic-bezier(0.1, 0.3, 0.7, 1) infinite;
+}
+
+/* Recharts High-Contrast Axis and Grid Styling */
+.recharts-cartesian-axis-tick text {
+  fill: var(--text-secondary) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+.recharts-cartesian-axis-line,
+.recharts-cartesian-axis-tick-line {
+  stroke: var(--border-card) !important;
+}
+.recharts-cartesian-grid line {
+  stroke: var(--border-card) !important;
+  stroke-opacity: 0.55 !important;
+}
+
+/* Custom Scrollbars in theme tokens */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
+
 ::-webkit-scrollbar-track {
-  background: var(--bg-base);
+  background: var(--bg-page);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--border-card);
   border-radius: 9999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+  background: var(--primary-btn);
 }
 
-/* Respect prefers-reduced-motion */
+/* Respect prefers-reduced-motion unconditionally */
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .mic-ripple-ring {
+    animation: none !important;
+  }
+
+  .skeleton-shimmer {
+    animation: none !important;
   }
 }

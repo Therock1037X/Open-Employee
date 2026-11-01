@@ -9,7 +9,7 @@ def test_whatsapp_dispatch():
     res = client.post(
         "/integrations/whatsapp/send",
         headers=headers,
-        json={"to_phone": "9876543210", "text": "Sugar restock order confirmed."},
+        json={"to_phone": "9876543210", "text": "Sugar restock order confirmed.", "approved": True},
     )
     assert res.status_code == 200
     data = res.json()

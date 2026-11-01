@@ -10,17 +10,15 @@ interface AnimatedNumberProps {
   prefix?: string;
   suffix?: string;
   className?: string;
-  isGold?: boolean;
 }
 
 export function AnimatedNumber({
   value,
-  duration = 800,
+  duration = 700,
   decimals = 0,
   prefix = "",
   suffix = "",
   className = "",
-  isGold = true,
 }: AnimatedNumberProps) {
   const shouldReduceMotion = useReducedMotion();
   const [displayValue, setDisplayValue] = useState(value);
@@ -31,13 +29,13 @@ export function AnimatedNumber({
       return;
     }
 
-    let start = 0;
+    const start = 0;
     const startTime = performance.now();
 
     const updateCount = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic: 1 - pow(1 - progress, 3)
+      // Ease out cubic
       const easeProgress = 1 - Math.pow(1 - progress, 3);
       const current = start + (value - start) * easeProgress;
 
@@ -62,11 +60,7 @@ export function AnimatedNumber({
     suffix;
 
   return (
-    <span
-      className={`font-mono font-bold tracking-tight ${
-        isGold ? "text-accent" : "text-text-primary"
-      } ${className}`}
-    >
+    <span className={`font-mono font-black tracking-tight text-primary-text ${className}`}>
       {formatted}
     </span>
   );

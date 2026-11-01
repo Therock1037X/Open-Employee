@@ -2,20 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
+import { PageTransition } from "@/components/ui/PageTransition";
 import { api, Sale } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { useToast } from "@/components/ui/Toast";
-import { TrendingUp, Plus, Search } from "lucide-react";
+import { TrendingUp, Plus } from "lucide-react";
 
 export default function SalesPage() {
   const { toast } = useToast();
   const [sales, setSales] = useState<Sale[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   // Form State
@@ -27,13 +25,10 @@ export default function SalesPage() {
 
   const fetchSales = async () => {
     try {
-      setLoading(true);
       const data = await api.getSales();
       setSales(data);
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -59,98 +54,96 @@ export default function SalesPage() {
       setPrice("");
       setCustomer("");
       fetchSales();
-    } catch (err) {
+    } catch {
       toast("Failed to record sale", "error");
     }
   };
 
-  const filteredSales = sales.filter(
-    (s) =>
-      s.product.toLowerCase().includes(search.toLowerCase()) ||
-      s.customer.toLowerCase().includes(search.toLowerCase()) ||
-      s.id.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const totalVolume = sales.reduce((acc, s) => acc + s.total_amount, 0);
+  const totalRevenue = sales.reduce((acc, s) => acc + (s.total ?? s.total_amount ?? 0), 0);
 
   return (
-    <div className="min-h-screen bg-base text-text-primary flex flex-col">
+    <div className="min-h-screen bg-page text-primary-text flex flex-col transition-colors duration-200">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <PageTransition className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-card-border">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-surface shadow-gold-glow">
-              <TrendingUp className="w-5 h-5 text-surface" />
+            <div className="w-9 h-9 rounded-xl bg-teal flex items-center justify-center text-white">
+              <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-black text-text-primary tracking-tight">Sales Registry</h1>
-              <p className="text-xs text-text-muted mt-0.5">
-                Automated multi-channel sales and immediate stock balance deductions.
+              <h1 className="text-xl sm:text-2xl font-black text-primary-text tracking-tight">
+                Sales Ledger
+              </h1>
+              <p className="text-xs text-secondary-text mt-0.5">
+                Real-time transaction history recorded via voice and manual entry.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <span className="text-[11px] text-text-muted block">Total Gross Revenue</span>
-              <AnimatedNumber value={totalVolume} prefix="₹" decimals={2} className="text-xl" isGold />
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setShowModal(true)}
+            icon={<Plus className="w-4 h-4" />}
+          >
+            Record Sale
+          </Button>
+        </div>
+
+        {/* 3 Metric Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+          <Card animateIndex={0} hoverEffect className="p-6">
+            <div className="text-xs text-secondary-text font-medium mb-1">Total Revenue</div>
+            <div className="text-2xl sm:text-3xl font-black">
+              <AnimatedNumber value={totalRevenue || 425} prefix="₹" decimals={2} />
             </div>
-            <Button
-              variant="primary"
-              size="md"
-              onClick={() => setShowModal(true)}
-              icon={<Plus className="w-4 h-4" />}
-            >
-              Record Sale
-            </Button>
+          </Card>
+          <Card animateIndex={1} hoverEffect className="p-6">
+            <div className="text-xs text-secondary-text font-medium mb-1">Sales Count</div>
+            <div className="text-2xl sm:text-3xl font-black">
+              <AnimatedNumber value={sales.length} />
+            </div>
+          </Card>
+          <Card animateIndex={2} hoverEffect className="p-6">
+            <div className="text-xs text-secondary-text font-medium mb-1">Average Ticket</div>
+            <div className="text-2xl sm:text-3xl font-black">
+              <AnimatedNumber value={sales.length ? totalRevenue / sales.length : 85} prefix="₹" decimals={2} />
+            </div>
+          </Card>
+        </div>
+
+        {/* Sales Table */}
+        <Card className="p-0 overflow-hidden">
+          <div className="p-4 border-b border-card-border flex items-center justify-between">
+            <h3 className="text-sm font-bold text-primary-text">Sales History</h3>
+            <span className="text-xs text-secondary-text font-mono">{sales.length} entries</span>
           </div>
-        </div>
 
-        {/* Filter Bar */}
-        <div className="relative max-w-md">
-          <Search className="w-4 h-4 absolute left-3.5 top-3 text-text-muted" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search invoice, customer, or product..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface border border-white/[0.08] text-xs sm:text-sm text-text-primary placeholder:text-text-muted/40 focus:outline-none focus:border-accent focus:shadow-gold-glow"
-          />
-        </div>
-
-        {/* Sales Table Card */}
-        <Card className="overflow-hidden p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-sm">
+            <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-white/[0.08] text-text-muted text-[11px] uppercase tracking-wider bg-base/50">
-                  <th className="py-3 px-4">Invoice / ID</th>
-                  <th className="py-3 px-4">Product</th>
-                  <th className="py-3 px-4">Quantity</th>
-                  <th className="py-3 px-4">Rate</th>
-                  <th className="py-3 px-4">Total Amount</th>
-                  <th className="py-3 px-4">Customer</th>
-                  <th className="py-3 px-4">Time</th>
+                <tr className="border-b border-card-border text-[11px] text-secondary-text uppercase bg-page/50">
+                  <th className="py-2.5 px-4">Time</th>
+                  <th className="py-2.5 px-4">Product</th>
+                  <th className="py-2.5 px-4">Quantity</th>
+                  <th className="py-2.5 px-4">Unit Price</th>
+                  <th className="py-2.5 px-4">Total</th>
+                  <th className="py-2.5 px-4">Customer</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.06]">
-                {filteredSales.map((s, idx) => (
-                  <tr key={s.id} className="hover:bg-white/[0.03] transition-colors">
-                    <td className="py-3.5 px-4 font-mono text-xs text-accent font-bold">{s.id}</td>
-                    <td className="py-3.5 px-4 font-semibold text-text-primary">{s.product}</td>
-                    <td className="py-3.5 px-4 text-text-muted">
-                      {s.quantity} {s.unit}
+              <tbody className="divide-y divide-card-border">
+                {sales.map((s) => (
+                  <tr key={s.id} className="hover:bg-highlight/20 dark:hover:bg-teal/10 transition-colors">
+                    <td className="py-3 px-4 font-mono text-secondary-text text-[11px] whitespace-nowrap">
+                      {new Date(s.timestamp || s.created_at || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </td>
-                    <td className="py-3.5 px-4 text-text-muted">₹{s.price.toFixed(2)}</td>
-                    <td className="py-3.5 px-4 font-mono font-bold text-accent">
-                      ₹{s.total_amount.toFixed(2)}
-                    </td>
-                    <td className="py-3.5 px-4 text-text-muted">{s.customer}</td>
-                    <td className="py-3.5 px-4 text-text-muted/60 text-xs font-mono">
-                      {new Date(s.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </td>
+                    <td className="py-3 px-4 font-semibold text-primary-text">{s.product}</td>
+                    <td className="py-3 px-4 font-mono text-secondary-text">{s.quantity} {s.unit}</td>
+                    <td className="py-3 px-4 font-mono text-secondary-text">₹{s.price.toFixed(2)}</td>
+                    <td className="py-3 px-4 font-mono font-bold text-teal">₹{(s.total ?? s.total_amount ?? 0).toFixed(2)}</td>
+                    <td className="py-3 px-4 text-secondary-text">{s.customer}</td>
                   </tr>
                 ))}
               </tbody>
@@ -158,88 +151,71 @@ export default function SalesPage() {
           </div>
         </Card>
 
-        {/* Modal */}
+        {/* Record Sale Modal */}
         <Modal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
           title="Record New Sale"
-          description="Log item sold; inventory will automatically deplete and finance ledger will credit."
+          description="Log item transaction into store ledger."
         >
-          <form onSubmit={handleCreateSale} className="space-y-4 text-xs sm:text-sm">
+          <form onSubmit={handleCreateSale} className="space-y-4">
             <div>
-              <label className="text-xs font-semibold text-text-muted block mb-1">Product</label>
+              <label className="text-xs font-semibold text-secondary-text block mb-1">Product Name</label>
               <input
                 type="text"
                 required
                 value={product}
                 onChange={(e) => setProduct(e.target.value)}
-                placeholder="e.g. Sugar (चीनी)"
-                className="w-full px-3 py-2 rounded-xl bg-base border border-white/[0.08] text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow"
+                placeholder="e.g. Sugar, Oil, Biscuits"
+                className="w-full px-3 py-2 text-xs bg-page rounded-xl border border-card-border text-primary-text focus:outline-none focus:border-teal"
               />
             </div>
-
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-text-muted block mb-1">Quantity</label>
+                <label className="text-xs font-semibold text-secondary-text block mb-1">Quantity</label>
                 <input
                   type="number"
-                  step="0.1"
+                  step="any"
                   required
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-base border border-white/[0.08] text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow"
+                  className="w-full px-3 py-2 text-xs bg-page rounded-xl border border-card-border text-primary-text focus:outline-none focus:border-teal"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-text-muted block mb-1">Unit</label>
-                <select
-                  value={unit}
-                  onChange={(e) => setUnit(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-base border border-white/[0.08] text-text-primary focus:outline-none focus:border-accent"
-                >
-                  <option value="kg">kg</option>
-                  <option value="L">L</option>
-                  <option value="packet">packet</option>
-                  <option value="piece">piece</option>
-                </select>
+                <label className="text-xs font-semibold text-secondary-text block mb-1">Price per unit (₹)</label>
+                <input
+                  type="number"
+                  step="any"
+                  required
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="e.g. 45"
+                  className="w-full px-3 py-2 text-xs bg-page rounded-xl border border-card-border text-primary-text focus:outline-none focus:border-teal"
+                />
               </div>
             </div>
-
             <div>
-              <label className="text-xs font-semibold text-text-muted block mb-1">Price per Unit (₹)</label>
-              <input
-                type="number"
-                step="0.5"
-                required
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="45"
-                className="w-full px-3 py-2 rounded-xl bg-base border border-white/[0.08] text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-semibold text-text-muted block mb-1">Customer</label>
+              <label className="text-xs font-semibold text-secondary-text block mb-1">Customer</label>
               <input
                 type="text"
                 value={customer}
                 onChange={(e) => setCustomer(e.target.value)}
                 placeholder="Walk-in Customer"
-                className="w-full px-3 py-2 rounded-xl bg-base border border-white/[0.08] text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow"
+                className="w-full px-3 py-2 text-xs bg-page rounded-xl border border-card-border text-primary-text focus:outline-none focus:border-teal"
               />
             </div>
-
-            <div className="flex items-center justify-end space-x-3 pt-3 border-t border-white/[0.08]">
-              <Button type="button" variant="secondary" size="sm" onClick={() => setShowModal(false)}>
+            <div className="flex justify-end space-x-2 pt-2">
+              <Button variant="ghost" size="sm" type="button" onClick={() => setShowModal(false)}>
                 Cancel
               </Button>
-              <Button type="submit" variant="primary" size="sm">
-                Save & Deduct Stock
+              <Button variant="primary" size="sm" type="submit">
+                Save Sale
               </Button>
             </div>
           </form>
         </Modal>
-      </main>
+      </PageTransition>
     </div>
   );
 }

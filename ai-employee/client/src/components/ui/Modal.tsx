@@ -45,33 +45,33 @@ export function Modal({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
+          {/* Backdrop with 200ms transition */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 bg-base/80 backdrop-blur-md"
+            className="fixed inset-0 bg-navy/60 dark:bg-black/70 backdrop-blur-sm"
           />
 
-          {/* Modal Card */}
+          {/* Modal Container: White with Sky Blue border (Light) / Navy with low-opacity Teal border (Dark) */}
           <motion.div
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 16 }}
+            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 12 }}
             animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
-            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 16 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className={`relative w-full ${maxWidthStyles} bg-surface border border-white/[0.08] rounded-2xl p-6 shadow-2xl z-10`}
+            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 12 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className={`relative w-full ${maxWidthStyles} bg-card border border-card-border rounded-xl p-6 shadow-2xl z-10`}
           >
             {/* Header */}
-            <div className="flex items-start justify-between pb-4 border-b border-white/[0.08]">
+            <div className="flex items-start justify-between pb-4 border-b border-card-border">
               <div>
-                {title && <h3 className="text-lg font-bold text-text-primary tracking-tight">{title}</h3>}
-                {description && <p className="text-xs text-text-muted mt-0.5">{description}</p>}
+                {title && <h3 className="text-lg font-bold text-primary-text tracking-tight">{title}</h3>}
+                {description && <p className="text-xs text-secondary-text mt-0.5">{description}</p>}
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-white/[0.05] transition-colors"
+                className="p-1.5 rounded-lg text-secondary-text hover:text-primary-text hover:bg-highlight/30 dark:hover:bg-teal/20 transition-colors"
                 title="Close"
               >
                 <X className="w-4 h-4" />

@@ -9,7 +9,7 @@ interface SkeletonProps {
 export function Skeleton({ className = "" }: SkeletonProps) {
   return (
     <div
-      className={`skeleton-shimmer rounded-xl border border-white/[0.04] ${className}`}
+      className={`skeleton-shimmer rounded-xl border border-card-border/40 ${className}`}
     />
   );
 }

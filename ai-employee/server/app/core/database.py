@@ -103,6 +103,26 @@ class MemoryRecord(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+class WhatsAppMessageRecord(Base):
+    __tablename__ = "whatsapp_messages"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    message_id = Column(String(128), unique=True, index=True, nullable=True)
+    sender = Column(String(64), index=True, nullable=False)
+    recipient = Column(String(64), index=True, nullable=True)
+    direction = Column(String(16), default="inbound", index=True)  # inbound, outbound
+    message_type = Column(String(32), default="text")              # text, image, document, template
+    text = Column(Text, nullable=True)
+    media_url = Column(String(512), nullable=True)
+    media_id = Column(String(128), nullable=True)
+    mime_type = Column(String(64), nullable=True)
+    filename = Column(String(255), nullable=True)
+    is_invoice = Column(Boolean, default=False)
+    status = Column(String(32), default="received")                # received, sent, pending_approval, failed
+    raw_payload = Column(JSON, default=dict)
+    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
+
+
 def init_db():
     """Create all tables in the database."""
     Base.metadata.create_all(bind=engine)

@@ -134,6 +134,60 @@ class ApprovalGate:
             db.add(audit)
             db.commit()
             db.refresh(record)
+
+            # Auto-dispatch external send actions when approved
+            if approved and record.action == "whatsapp_send":
+                try:
+                    from app.modules.integrations.whatsapp.client import whatsapp_client
+                    import asyncio
+                    details = record.details or {}
+                    to_phone = details.get("to_phone") or record.recipient or ""
+                    
+                    try:
+                        loop = asyncio.get_running_loop()
+                        if details.get("template_name"):
+                            loop.create_task(whatsapp_client.send_template(
+                                to_phone=to_phone,
+                                template_name=details.get("template_name", "hello_world"),
+                                language_code=details.get("language_code", "en_US"),
+                                components=details.get("components"),
+                            ))
+                        elif details.get("type") == "marketing_status":
+                            loop.create_task(whatsapp_client.post_status(
+                                text=details.get("text"),
+                                image_url=details.get("image_url"),
+                                to_phone=to_phone,
+                            ))
+                        else:
+                            loop.create_task(whatsapp_client.send_message(
+                                to_phone=to_phone,
+                                message=details.get("message", ""),
+                                image_url=details.get("image_url"),
+                            ))
+                    except RuntimeError:
+                        # If no running loop, run synchronously with asyncio.run
+                        if details.get("template_name"):
+                            asyncio.run(whatsapp_client.send_template(
+                                to_phone=to_phone,
+                                template_name=details.get("template_name", "hello_world"),
+                                language_code=details.get("language_code", "en_US"),
+                                components=details.get("components"),
+                            ))
+                        elif details.get("type") == "marketing_status":
+                            asyncio.run(whatsapp_client.post_status(
+                                text=details.get("text"),
+                                image_url=details.get("image_url"),
+                                to_phone=to_phone,
+                            ))
+                        else:
+                            asyncio.run(whatsapp_client.send_message(
+                                to_phone=to_phone,
+                                message=details.get("message", ""),
+                                image_url=details.get("image_url"),
+                            ))
+                except Exception:
+                    pass
+
             return record
         finally:
             if close_session:

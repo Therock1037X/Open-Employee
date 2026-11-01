@@ -9,11 +9,13 @@ export interface Sale {
   unit: string;
   price: number;
   total_amount: number;
+  total?: number;
   customer: string;
   raw_text?: string;
   lang: string;
   created_by: string;
   created_at: string;
+  timestamp?: string;
 }
 
 export interface StockItem {
@@ -36,6 +38,7 @@ export interface FinanceEntry {
   reference_id?: string;
   description?: string;
   created_at: string;
+  timestamp?: string;
 }
 
 export interface FinanceSummary {
@@ -44,6 +47,9 @@ export interface FinanceSummary {
   net_profit: number;
   today_revenue: number;
   today_transactions_count: number;
+  monthly_revenue?: number;
+  today_expenses?: number;
+  net_cashflow?: number;
 }
 
 export interface UPIOrder {
@@ -80,6 +86,23 @@ export interface ApprovalTask {
   reason: string;
   status: "pending" | "approved" | "rejected";
   created_at: string;
+}
+
+export interface WhatsAppInboxItem {
+  id: number;
+  message_id?: string;
+  sender: string;
+  recipient?: string;
+  direction: "inbound" | "outbound";
+  message_type: string;
+  text?: string;
+  media_url?: string;
+  media_id?: string;
+  mime_type?: string;
+  filename?: string;
+  is_invoice?: boolean;
+  status: string;
+  timestamp: string;
 }
 
 export interface AuditEvent {
@@ -455,4 +478,107 @@ export const api = {
   async getAuditLogs(): Promise<AuditEvent[]> {
     return [...localAuditEvents];
   },
+
+  // WhatsApp Cloud API Integrations
+  async getWhatsAppInbox(limit = 50): Promise<WhatsAppInboxItem[]> {
+    return fetchWithFallback<WhatsAppInboxItem[]>(
+      `/integrations/whatsapp/inbox?limit=${limit}`,
+      { method: 'GET' },
+      () => localWhatsAppInbox
+    );
+  },
+
+  async sendWhatsAppMessage(payload: {
+    to_phone: string;
+    text: string;
+    image_url?: string;
+    approved?: boolean;
+  }): Promise<any> {
+    return fetchWithFallback<any>(
+      '/integrations/whatsapp/send',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
+      () => ({
+        status: 'SENT',
+        recipient: payload.to_phone,
+        text: payload.text,
+        channel: 'WhatsApp Cloud API (Mock/Simulated)',
+      })
+    );
+  },
+
+  async sendWhatsAppTemplate(payload: {
+    to_phone: string;
+    template_name?: string;
+    language_code?: string;
+    components?: any[];
+    approved?: boolean;
+  }): Promise<any> {
+    return fetchWithFallback<any>(
+      '/integrations/whatsapp/send-template',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
+      () => ({
+        status: 'SENT',
+        recipient: payload.to_phone,
+        template_name: payload.template_name || 'hello_world',
+        channel: 'WhatsApp Cloud API (Mock/Simulated)',
+      })
+    );
+  },
+
+  async postWhatsAppStatus(payload: {
+    text?: string;
+    image_url?: string;
+    to_phone?: string;
+    approved?: boolean;
+  }): Promise<any> {
+    return fetchWithFallback<any>(
+      '/integrations/whatsapp/post-status',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
+      () => ({
+        status: 'PUBLISHED',
+        type: 'marketing_status',
+        text: payload.text,
+        image_url: payload.image_url,
+        channel: 'WhatsApp Cloud API (Mock/Simulated)',
+      })
+    );
+  },
 };
+
+
+let localWhatsAppInbox: WhatsAppInboxItem[] = [
+  {
+    id: 1,
+    message_id: 'wamid.inbound.001',
+    sender: '919876543210',
+    recipient: 'business',
+    direction: 'inbound',
+    message_type: 'text',
+    text: 'Namaste, need 5 bags of sugar and 2 tin mustard oil delivered tomorrow.',
+    status: 'received',
+    timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+  },
+  {
+    id: 2,
+    message_id: 'wamid.inbound.002',
+    sender: '919811223344',
+    recipient: 'business',
+    direction: 'inbound',
+    message_type: 'document',
+    filename: 'Tax_Invoice_Vendor_October.pdf',
+    mime_type: 'application/pdf',
+    is_invoice: true,
+    text: 'Attached wholesale supplier GST invoice for October dispatch.',
+    status: 'received',
+    timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+  },
+];

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { QrCode, CheckCircle2, X, Smartphone, Copy, Check, RefreshCw } from "lucide-react";
+import { QrCode, CheckCircle2, X, Copy, Check, RefreshCw } from "lucide-react";
 import { api, UPIOrder } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -41,8 +41,8 @@ export function RazorpayUPIModal({
         note: note,
       });
       setActiveOrder(order);
-      toast("Generated Dynamic UPI QR Intent", "gold");
-    } catch (err) {
+      toast("Generated Dynamic UPI QR Intent", "teal");
+    } catch {
       toast("Error creating UPI checkout", "error");
     } finally {
       setIsLoading(false);
@@ -59,7 +59,7 @@ export function RazorpayUPIModal({
       if (onPaymentSuccess) {
         onPaymentSuccess(updated);
       }
-    } catch (err) {
+    } catch {
       toast("Simulation failed", "error");
     } finally {
       setIsSimulating(false);
@@ -70,32 +70,32 @@ export function RazorpayUPIModal({
     if (activeOrder) {
       navigator.clipboard.writeText(activeOrder.upi_intent_url);
       setCopied(true);
-      toast("UPI Link Copied to Clipboard", "gold");
+      toast("UPI Link Copied to Clipboard", "teal");
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
   return (
-    <div className="w-full bg-surface border border-white/[0.08] rounded-2xl p-6 shadow-2xl relative">
+    <div className="w-full bg-card border border-card-border rounded-xl p-5 sm:p-6 shadow-card relative transition-colors duration-200">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+      <div className="flex items-center justify-between pb-4 border-b border-card-border">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-surface shadow-gold-glow">
-            <QrCode className="w-5 h-5 text-surface" />
+          <div className="w-9 h-9 rounded-xl bg-teal flex items-center justify-center text-white shadow-xs">
+            <QrCode className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-bold text-text-primary flex items-center space-x-2">
-              <span>Razorpay Instant UPI Checkout</span>
-              <Badge variant="gold">Zero Fee</Badge>
+            <h3 className="text-sm sm:text-base font-bold text-primary-text flex items-center space-x-2">
+              <span>UPI Checkout</span>
+              <Badge variant="teal">Instant Settlement</Badge>
             </h3>
-            <p className="text-xs text-text-muted mt-0.5">Scan via GPay, PhonePe, Paytm, or BHIM UPI</p>
+            <p className="text-xs text-secondary-text mt-0.5 font-medium">Scan and pay with any UPI application</p>
           </div>
         </div>
 
         {onClose && (
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-white/[0.05]"
+            className="p-1.5 rounded-lg text-secondary-text hover:text-primary-text hover:bg-highlight/30 dark:hover:bg-teal/20"
           >
             <X className="w-4 h-4" />
           </button>
@@ -107,23 +107,23 @@ export function RazorpayUPIModal({
         <div className="mt-5 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-semibold text-text-muted block mb-1">
+              <label className="text-xs font-bold text-primary-text block mb-1">
                 Amount (₹ INR)
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-2.5 text-accent font-bold">₹</span>
+                <span className="absolute left-3.5 top-2.5 text-teal dark:text-skyblue font-black">₹</span>
                 <input
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="150"
-                  className="w-full pl-8 pr-3 py-2.5 rounded-xl bg-base border border-white/[0.08] text-sm text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow font-bold"
+                  className="w-full pl-8 pr-3 py-2.5 rounded-xl bg-page border border-card-border text-sm text-primary-text focus:outline-none focus:border-teal font-black"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-text-muted block mb-1">
+              <label className="text-xs font-bold text-primary-text block mb-1">
                 Customer Name
               </label>
               <input
@@ -131,21 +131,21 @@ export function RazorpayUPIModal({
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 placeholder="Customer"
-                className="w-full px-3 py-2.5 rounded-xl bg-base border border-white/[0.08] text-sm text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow"
+                className="w-full px-3 py-2.5 rounded-xl bg-page border border-card-border text-sm text-primary-text focus:outline-none focus:border-teal font-semibold"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-text-muted block mb-1">
-              Payment Note / Invoice Reference
+            <label className="text-xs font-bold text-primary-text block mb-1">
+              Payment Reference Note
             </label>
             <input
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Store purchase billing"
-              className="w-full px-3 py-2.5 rounded-xl bg-base border border-white/[0.08] text-sm text-text-primary focus:outline-none focus:border-accent focus:shadow-gold-glow"
+              className="w-full px-3 py-2.5 rounded-xl bg-page border border-card-border text-sm text-primary-text focus:outline-none focus:border-teal font-medium"
             />
           </div>
 
@@ -158,21 +158,21 @@ export function RazorpayUPIModal({
             className="w-full"
             icon={<QrCode className="w-4 h-4" />}
           >
-            Generate Dynamic UPI QR Code
+            Generate Dynamic UPI QR
           </Button>
         </div>
       ) : (
         <div className="mt-5 flex flex-col items-center">
           {activeOrder.status === "paid" ? (
             <div className="py-8 flex flex-col items-center text-center space-y-3">
-              <div className="w-16 h-16 rounded-full bg-success/20 text-success border border-success/40 flex items-center justify-center shadow-lg animate-bounce">
-                <CheckCircle2 className="w-10 h-10" />
+              <div className="w-14 h-14 rounded-full bg-success/20 text-success border border-success/40 flex items-center justify-center">
+                <CheckCircle2 className="w-8 h-8" />
               </div>
-              <h4 className="text-lg font-bold text-text-primary">Payment Successfully Verified!</h4>
-              <p className="text-xs text-text-muted">
+              <h4 className="text-lg font-bold text-primary-text">Payment Verified</h4>
+              <p className="text-xs font-medium text-secondary-text">
                 ₹{activeOrder.amount.toFixed(2)} received from {activeOrder.customer_name}.
               </p>
-              <div className="px-3 py-1.5 rounded-lg bg-base border border-white/[0.08] text-xs font-mono text-accent">
+              <div className="px-3 py-1.5 rounded-lg bg-page border border-card-border text-xs font-mono font-bold text-teal dark:text-skyblue">
                 Order ID: {activeOrder.order_id}
               </div>
               <Button
@@ -183,88 +183,82 @@ export function RazorpayUPIModal({
                   setAmount("150");
                 }}
               >
-                Collect Another Payment
+                New Payment
               </Button>
             </div>
           ) : (
             <div className="w-full flex flex-col items-center space-y-4">
               {/* QR Code Presentation */}
-              <div className="p-4 rounded-2xl bg-white shadow-gold-glow flex flex-col items-center">
-                <svg className="w-44 h-44" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="5" y="5" width="28" height="28" rx="4" fill="#14213D" />
+              <div className="p-4 rounded-xl bg-white border-2 border-card-border flex flex-col items-center shadow-md">
+                <svg className="w-40 h-40 text-navy" viewBox="0 0 100 100" fill="currentColor">
+                  <rect x="5" y="5" width="28" height="28" rx="4" />
                   <rect x="9" y="9" width="20" height="20" rx="2" fill="white" />
-                  <rect x="13" y="13" width="12" height="12" rx="1" fill="#14213D" />
+                  <rect x="13" y="13" width="12" height="12" rx="1" />
 
-                  <rect x="67" y="5" width="28" height="28" rx="4" fill="#14213D" />
+                  <rect x="67" y="5" width="28" height="28" rx="4" />
                   <rect x="71" y="9" width="20" height="20" rx="2" fill="white" />
-                  <rect x="75" y="13" width="12" height="12" rx="1" fill="#14213D" />
+                  <rect x="75" y="13" width="12" height="12" rx="1" />
 
-                  <rect x="5" y="67" width="28" height="28" rx="4" fill="#14213D" />
+                  <rect x="5" y="67" width="28" height="28" rx="4" />
                   <rect x="9" y="71" width="20" height="20" rx="2" fill="white" />
-                  <rect x="13" y="75" width="12" height="12" rx="1" fill="#14213D" />
+                  <rect x="13" y="75" width="12" height="12" rx="1" />
 
-                  <rect x="37" y="8" width="5" height="5" fill="#14213D" />
-                  <rect x="47" y="8" width="6" height="5" fill="#14213D" />
-                  <rect x="57" y="8" width="5" height="5" fill="#14213D" />
-                  <rect x="37" y="18" width="7" height="6" fill="#14213D" />
-                  <rect x="48" y="18" width="5" height="5" fill="#14213D" />
-                  <rect x="37" y="28" width="5" height="5" fill="#14213D" />
-                  <rect x="57" y="28" width="6" height="6" fill="#14213D" />
-
-                  <rect x="42" y="42" width="16" height="16" rx="4" fill="#FCA311" />
-                  <circle cx="50" cy="50" r="4" fill="#14213D" />
-
-                  <rect x="37" y="67" width="6" height="6" fill="#14213D" />
-                  <rect x="48" y="67" width="8" height="5" fill="#14213D" />
-                  <rect x="62" y="67" width="6" height="7" fill="#14213D" />
-                  <rect x="74" y="67" width="5" height="5" fill="#14213D" />
-                  <rect x="85" y="67" width="6" height="6" fill="#14213D" />
-                  <rect x="37" y="78" width="6" height="6" fill="#14213D" />
-                  <rect x="50" y="78" width="8" height="6" fill="#14213D" />
-                  <rect x="67" y="78" width="6" height="6" fill="#14213D" />
-                  <rect x="80" y="78" width="7" height="6" fill="#14213D" />
-                  <rect x="37" y="89" width="8" height="6" fill="#14213D" />
-                  <rect x="52" y="89" width="6" height="6" fill="#14213D" />
-                  <rect x="67" y="89" width="6" height="6" fill="#14213D" />
-                  <rect x="80" y="89" width="6" height="6" fill="#14213D" />
+                  {/* QR Data Dots */}
+                  <rect x="42" y="12" width="6" height="6" rx="1" />
+                  <rect x="52" y="12" width="6" height="6" rx="1" />
+                  <rect x="42" y="24" width="6" height="6" rx="1" />
+                  <rect x="12" y="42" width="6" height="6" rx="1" />
+                  <rect x="24" y="42" width="6" height="6" rx="1" />
+                  <rect x="42" y="42" width="16" height="16" rx="2" fill="var(--palette-teal)" />
+                  <rect x="68" y="42" width="6" height="6" rx="1" />
+                  <rect x="78" y="52" width="6" height="6" rx="1" />
+                  <rect x="42" y="68" width="6" height="6" rx="1" />
+                  <rect x="54" y="78" width="6" height="6" rx="1" />
+                  <rect x="68" y="68" width="16" height="16" rx="2" />
                 </svg>
-
-                <div className="mt-2 text-center">
-                  <div className="text-sm font-black text-surface tracking-wider">
-                    ₹{activeOrder.amount.toFixed(2)}
-                  </div>
-                  <div className="text-[10px] text-surface font-mono font-bold">openemployee@icici</div>
-                </div>
+                <span className="text-xs font-black text-navy mt-2 tracking-wider uppercase">
+                  BHIM UPI Dynamic QR
+                </span>
               </div>
 
-              {/* Status */}
-              <div className="flex items-center space-x-2 text-xs text-accent">
-                <span className="w-2 h-2 rounded-full bg-accent animate-ping" />
-                <span className="font-medium">Waiting for customer to scan and pay...</span>
+              {/* Amount and Customer */}
+              <div className="text-center space-y-1">
+                <span className="text-2xl sm:text-3xl font-black text-primary-text font-mono">
+                  ₹{activeOrder.amount.toFixed(2)}
+                </span>
+                <p className="text-xs font-semibold text-secondary-text">Customer: {activeOrder.customer_name}</p>
               </div>
 
-              {/* Action Buttons */}
-              <div className="w-full flex items-center justify-between gap-3 pt-2">
+              {/* Copy Intent Link */}
+              <div className="flex items-center space-x-2 w-full max-w-sm">
+                <input
+                  type="text"
+                  readOnly
+                  value={activeOrder.upi_intent_url}
+                  className="w-full text-xs bg-page px-3 py-2.5 rounded-xl border border-card-border font-mono font-semibold text-primary-text truncate focus:outline-none"
+                />
                 <Button
                   variant="secondary"
                   size="sm"
                   onClick={copyUPIIntent}
-                  className="flex-1"
+                  icon={copied ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}
                 >
-                  {copied ? <Check className="w-3.5 h-3.5 mr-1 text-success" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
-                  <span>{copied ? "Copied" : "Copy Link"}</span>
+                  {copied ? "Copied" : "Copy"}
                 </Button>
+              </div>
 
+              {/* Mock Webhook Simulator */}
+              <div className="w-full pt-3 border-t border-card-border flex flex-col items-center space-y-2">
+                <span className="text-xs text-secondary-text font-medium">Customer simulation:</span>
                 <Button
-                  variant="primary"
+                  variant="outline"
                   size="sm"
                   onClick={handleSimulatePayment}
-                  disabled={isSimulating}
                   isLoading={isSimulating}
-                  className="flex-1"
+                  icon={<RefreshCw className="w-3.5 h-3.5" />}
+                  className="w-full max-w-sm"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
-                  <span>Simulate Pay</span>
+                  Simulate Payment Received
                 </Button>
               </div>
             </div>

@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, Literal, List, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 # --- Business & Sales Schemas (User 1) ---
 
@@ -136,6 +136,29 @@ class WhatsAppMessage(BaseModel):
     to_phone: str
     text: str
     image_url: Optional[str] = None
+    approved: bool = False
+
+
+class WhatsAppImageMessage(BaseModel):
+    to_phone: str
+    image_url: str
+    caption: Optional[str] = None
+    approved: bool = False
+
+
+class WhatsAppTemplateRequest(BaseModel):
+    to_phone: str
+    template_name: str = "hello_world"
+    language_code: str = "en_US"
+    components: Optional[List[Dict[str, Any]]] = None
+    approved: bool = True
+
+
+class WhatsAppStatusRequest(BaseModel):
+    text: Optional[str] = None
+    image_url: Optional[str] = None
+    to_phone: Optional[str] = None
+    approved: bool = False
 
 
 class InstagramPostRequest(BaseModel):

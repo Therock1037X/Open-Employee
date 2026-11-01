@@ -2,21 +2,20 @@
 
 import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
+import { PageTransition } from "@/components/ui/PageTransition";
 import { RazorpayUPIModal } from "@/components/RazorpayUPIModal";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { api, FinanceEntry, FinanceSummary } from "@/lib/api";
-import { Wallet, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Wallet, TrendingUp, TrendingDown } from "lucide-react";
 
 export default function FinancePage() {
   const [summary, setSummary] = useState<FinanceSummary | null>(null);
   const [ledger, setLedger] = useState<FinanceEntry[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const fetchFinance = async () => {
     try {
-      setLoading(true);
       const [sumRes, ledRes] = await Promise.all([
         api.getFinanceSummary(),
         api.getFinanceLedger(),
@@ -25,8 +24,6 @@ export default function FinancePage() {
       setLedger(ledRes);
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -35,22 +32,22 @@ export default function FinancePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-base text-text-primary flex flex-col">
+    <div className="min-h-screen bg-page text-primary-text flex flex-col transition-colors duration-200">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <PageTransition className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Banner */}
-        <div className="pb-4 border-b border-white/[0.08]">
+        <div className="pb-4 border-b border-card-border">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-surface shadow-gold-glow">
-              <Wallet className="w-5 h-5 text-surface" />
+            <div className="w-9 h-9 rounded-xl bg-teal flex items-center justify-center text-white">
+              <Wallet className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-black text-text-primary tracking-tight">
-                Finance & UPI Reconciliation
+              <h1 className="text-xl sm:text-2xl font-black text-primary-text tracking-tight">
+                Finance & UPI
               </h1>
-              <p className="text-xs text-text-muted mt-0.5">
-                Automated store bookkeeping with instant dynamic Razorpay UPI settlement.
+              <p className="text-xs text-secondary-text mt-0.5">
+                Automated bookkeeping with dynamic Razorpay UPI settlement.
               </p>
             </div>
           </div>
@@ -58,9 +55,9 @@ export default function FinancePage() {
 
         {/* 3 Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-          <Card hoverEffect className="p-6">
-            <div className="flex items-center justify-between text-xs text-text-muted mb-2 font-medium">
-              <span>Gross Inflow (Income)</span>
+          <Card animateIndex={0} hoverEffect className="p-6">
+            <div className="flex items-center justify-between text-xs text-secondary-text mb-2 font-medium">
+              <span>Gross Inflow</span>
               <div className="p-1.5 rounded-lg bg-success/15 text-success">
                 <TrendingUp className="w-4 h-4" />
               </div>
@@ -70,98 +67,94 @@ export default function FinancePage() {
                 value={summary?.total_income || 337.5}
                 prefix="₹"
                 decimals={2}
-                isGold
               />
             </div>
-            <p className="text-[11px] text-text-muted mt-1">From recorded sales and UPI receipts</p>
           </Card>
 
-          <Card hoverEffect className="p-6">
-            <div className="flex items-center justify-between text-xs text-text-muted mb-2 font-medium">
-              <span>Gross Outflow (Expenses)</span>
+          <Card animateIndex={1} hoverEffect className="p-6">
+            <div className="flex items-center justify-between text-xs text-secondary-text mb-2 font-medium">
+              <span>Gross Outflow</span>
               <div className="p-1.5 rounded-lg bg-error/15 text-error">
                 <TrendingDown className="w-4 h-4" />
               </div>
             </div>
             <div className="text-2xl sm:text-3xl font-black">
               <AnimatedNumber
-                value={summary?.total_expense || 450.0}
+                value={summary?.total_expense || 0}
                 prefix="₹"
                 decimals={2}
-                isGold={false}
               />
             </div>
-            <p className="text-[11px] text-text-muted mt-1">Shop utilities, rent, supplier purchases</p>
           </Card>
 
-          <Card hoverEffect className="p-6">
-            <div className="flex items-center justify-between text-xs text-text-muted mb-2 font-medium">
-              <span>Net Store Balance</span>
-              <div className="p-1.5 rounded-lg bg-accent/15 text-accent">
+          <Card animateIndex={2} hoverEffect className="p-6">
+            <div className="flex items-center justify-between text-xs text-secondary-text mb-2 font-medium">
+              <span>Net Cash Flow</span>
+              <div className="p-1.5 rounded-lg bg-teal/15 text-teal dark:text-skyblue">
                 <Wallet className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-black">
+            <div className="text-2xl sm:text-3xl font-black text-success">
               <AnimatedNumber
-                value={summary?.net_profit || 187.5}
+                value={summary?.net_cashflow || 337.5}
                 prefix="₹"
                 decimals={2}
-                isGold
               />
             </div>
-            <p className="text-[11px] text-text-muted mt-1">Cash in drawer + active UPI settlements</p>
           </Card>
         </div>
 
-        {/* 2-Column: Left = Ledger, Right = UPI Terminal */}
+        {/* Dynamic UPI Checkout & Ledger Table */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column: Ledger Table (7 cols) */}
-          <div className="lg:col-span-7 space-y-4">
-            <Card className="p-6">
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4">
-                <h3 className="text-sm font-bold text-text-primary">Financial Ledger Entries</h3>
-                <Badge variant="gold">Auto-Balanced</Badge>
-              </div>
-
-              <div className="space-y-3">
-                {ledger.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="p-3.5 rounded-xl bg-base border border-white/[0.08] flex items-center justify-between hover:border-white/[0.15] transition-colors"
-                  >
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xs font-semibold text-text-primary">{entry.description}</span>
-                        <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-surface border border-white/[0.08] text-text-muted">
-                          {entry.payment_mode}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-text-muted/60 mt-0.5">
-                        {entry.category} &bull; {new Date(entry.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div
-                        className={`text-xs font-mono font-bold ${
-                          entry.type === "income" ? "text-accent" : "text-error"
-                        }`}
-                      >
-                        {entry.type === "income" ? "+" : "-"}₹{entry.amount.toFixed(2)}
-                      </div>
-                      <span className="text-[10px] text-text-muted/40 font-mono">{entry.id}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </div>
-
-          {/* Right Column: Embedded Razorpay UPI Terminal (5 cols) */}
           <div className="lg:col-span-5">
             <RazorpayUPIModal onPaymentSuccess={fetchFinance} />
           </div>
+
+          <div className="lg:col-span-7">
+            <Card className="p-0 overflow-hidden">
+              <div className="p-4 border-b border-card-border flex items-center justify-between">
+                <h3 className="text-sm font-bold text-primary-text">Reconciliation Ledger</h3>
+                <Badge variant="teal">Auto-synced</Badge>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-card-border text-[11px] text-secondary-text uppercase bg-page/50">
+                      <th className="py-2.5 px-4">Time</th>
+                      <th className="py-2.5 px-4">Category</th>
+                      <th className="py-2.5 px-4">Description</th>
+                      <th className="py-2.5 px-4">Type</th>
+                      <th className="py-2.5 px-4 text-right">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-card-border">
+                    {ledger.map((entry) => (
+                      <tr key={entry.id} className="hover:bg-highlight/20 dark:hover:bg-teal/10 transition-colors">
+                        <td className="py-3 px-4 font-mono text-[11px] text-secondary-text whitespace-nowrap">
+                          {new Date(entry.timestamp || entry.created_at || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </td>
+                        <td className="py-3 px-4 font-semibold text-primary-text capitalize">{entry.category}</td>
+                        <td className="py-3 px-4 text-secondary-text truncate max-w-[180px]">{entry.description}</td>
+                        <td className="py-3 px-4">
+                          {entry.type === "income" ? (
+                            <Badge variant="success">INCOME</Badge>
+                          ) : (
+                            <Badge variant="error">EXPENSE</Badge>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-right font-mono font-bold text-teal">
+                          ₹{entry.amount.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
         </div>
-      </main>
+      </PageTransition>
     </div>
   );
 }

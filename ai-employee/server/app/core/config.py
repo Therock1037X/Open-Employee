@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     RAZORPAY_KEY_SECRET: str | None = os.getenv("RAZORPAY_KEY_SECRET")
     WHATSAPP_TOKEN: str | None = os.getenv("WHATSAPP_TOKEN")
     WHATSAPP_PHONE_ID: str | None = os.getenv("WHATSAPP_PHONE_ID")
+    WHATSAPP_VERIFY_TOKEN: str | None = os.getenv("WHATSAPP_VERIFY_TOKEN")
     INSTAGRAM_TOKEN: str | None = os.getenv("INSTAGRAM_TOKEN")
     INDIAMART_API_KEY: str | None = os.getenv("INDIAMART_API_KEY")
 

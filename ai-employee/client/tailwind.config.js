@@ -9,31 +9,83 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        base: "var(--bg-base)",
-        surface: "var(--bg-surface)",
-        accent: "var(--accent)",
-        "text-muted": "var(--text-muted)",
-        "text-primary": "var(--text-primary)",
-        error: "var(--error)",
-        success: "var(--success)",
+        // Core Palette Tokens
+        navy: {
+          DEFAULT: "#2F4156",
+          dark: "#1B2735",
+          deep: "#141E28",
+        },
+        teal: {
+          DEFAULT: "#567C8D",
+          dark: "#3F5E6E",
+          light: "#6E95A6",
+          bright: "#7DA6B8",
+        },
+        skyblue: {
+          DEFAULT: "#C8D9E6",
+          light: "#E1ECF4",
+          bright: "#D8E7F2",
+        },
+        beige: {
+          DEFAULT: "#F5EFEB",
+          light: "#FAF7F5",
+        },
+        white: "#FFFFFF",
+
+        // Status Colors (strictly Red & Green)
+        error: {
+          DEFAULT: "#EF4444",
+          light: "#F87171",
+        },
+        success: {
+          DEFAULT: "#10B981",
+          light: "#34D399",
+        },
+
+        // CSS Variables for dynamic themes
+        page: "var(--bg-page)",
+        card: "var(--bg-card)",
+        navbar: "var(--bg-navbar)",
+        modal: "var(--bg-modal)",
+        "card-border": "var(--border-card)",
+        "card-border-strong": "var(--border-strong)",
+        "primary-text": "var(--text-primary)",
+        "secondary-text": "var(--text-secondary)",
+        "accent-text": "var(--accent-text)",
+        "chip-bg": "var(--chip-bg)",
+        "chip-text": "var(--chip-text)",
+        "chip-border": "var(--chip-border)",
+        "primary-btn": "var(--primary-btn)",
+        "primary-btn-text": "var(--primary-btn-text)",
+        highlight: "var(--highlight)",
+        "highlight-hover": "var(--highlight-hover)",
       },
       borderRadius: {
+        lg: "0.5rem",
+        xl: "0.75rem",
         "2xl": "1rem",
         "3xl": "1.5rem",
+      },
+      transitionDuration: {
+        150: "150ms",
+        200: "200ms",
+        250: "250ms",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
         heading: ["var(--font-inter)", "Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        "gold-glow": "0 0 20px -2px rgba(252, 163, 17, 0.35)",
-        "gold-glow-lg": "0 0 35px -3px rgba(252, 163, 17, 0.45)",
+        xs: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        card: "var(--shadow-card)",
+        "card-hover": "var(--shadow-card-hover)",
+        "teal-glow": "0 0 16px -2px rgba(86, 124, 141, 0.35)",
+        "button-lift": "0 4px 12px -2px rgba(86, 124, 141, 0.4)",
       },
       animation: {
-        "fade-in": "fadeIn 0.3s ease-out forwards",
-        "slide-up": "slideUp 0.3s ease-out forwards",
-        "pulse-gold": "pulseGold 2s infinite ease-in-out",
-        "shake": "shake 0.4s ease-in-out",
+        "fade-in": "fadeIn 0.25s ease-out forwards",
+        "slide-up": "slideUp 0.25s ease-out forwards",
+        "soft-ripple": "softRipple 1.8s cubic-bezier(0, 0.2, 0.8, 1) infinite",
       },
       keyframes: {
         fadeIn: {
@@ -41,17 +93,12 @@ module.exports = {
           "100%": { opacity: "1" },
         },
         slideUp: {
-          "0%": { opacity: "0", transform: "translateY(12px)" },
+          "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
-        pulseGold: {
-          "0%, 100%": { opacity: "1", transform: "scale(1)" },
-          "50%": { opacity: "0.6", transform: "scale(1.15)" },
-        },
-        shake: {
-          "0%, 100%": { transform: "translateX(0)" },
-          "20%, 60%": { transform: "translateX(-6px)" },
-          "40%, 80%": { transform: "translateX(6px)" },
+        softRipple: {
+          "0%": { transform: "scale(1)", opacity: "0.7" },
+          "100%": { transform: "scale(2.1)", opacity: "0" },
         },
       },
     },
