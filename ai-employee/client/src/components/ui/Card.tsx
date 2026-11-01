@@ -40,7 +40,7 @@ export function Card({
   return (
     <motion.div
       {...motionProps}
-      className={`app-card p-6 ${
+      className={`app-card rounded-2xl p-6 ${
         hoverEffect ? "app-card-hover" : ""
       } ${className}`}
       {...(props as any)}
