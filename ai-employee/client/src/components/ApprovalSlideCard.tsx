@@ -6,6 +6,7 @@ import { ShieldAlert, Check, X, AlertTriangle, ArrowRight } from "lucide-react";
 import { api, ApprovalTask } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
+import { useLanguage } from "@/lib/i18n";
 
 interface ApprovalSlideCardProps {
   onApprovalResolved?: () => void;
@@ -13,6 +14,7 @@ interface ApprovalSlideCardProps {
 
 export function ApprovalSlideCard({ onApprovalResolved }: ApprovalSlideCardProps) {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
   const [approvals, setApprovals] = useState<ApprovalTask[]>([]);
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -77,7 +79,7 @@ export function ApprovalSlideCard({ onApprovalResolved }: ApprovalSlideCardProps
               <div>
                 <div className="flex items-center space-x-2">
                   <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-teal text-white tracking-wide">
-                    Human Approval Required
+                    {t.approvalRequired}
                   </span>
                   {pendingItem.amount && (
                     <span className="text-xs font-black text-primary-text font-mono bg-page px-2 py-0.5 rounded-md border border-card-border">
@@ -89,7 +91,7 @@ export function ApprovalSlideCard({ onApprovalResolved }: ApprovalSlideCardProps
                   {pendingItem.action}: {pendingItem.target}
                 </h4>
                 <p className="text-xs text-secondary-text font-medium mt-0.5">
-                  {pendingItem.reason || "Awaiting owner authorization before dispatching."}
+                  {pendingItem.reason || t.awaitingAuth}
                 </p>
               </div>
             </div>
@@ -103,7 +105,7 @@ export function ApprovalSlideCard({ onApprovalResolved }: ApprovalSlideCardProps
                 isLoading={loadingId === pendingItem.id}
                 icon={<X className="w-4 h-4" />}
               >
-                Reject
+                {t.reject}
               </Button>
               <Button
                 variant="success"
@@ -112,7 +114,7 @@ export function ApprovalSlideCard({ onApprovalResolved }: ApprovalSlideCardProps
                 isLoading={loadingId === pendingItem.id}
                 icon={<Check className="w-4 h-4" />}
               >
-                Approve
+                {t.approve}
               </Button>
             </div>
           </div>

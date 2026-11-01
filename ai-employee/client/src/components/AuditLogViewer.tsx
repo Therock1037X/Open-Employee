@@ -9,8 +9,10 @@ import {
 } from "lucide-react";
 import { api, AuditEvent } from "@/lib/api";
 import { Badge } from "@/components/ui/Badge";
+import { useLanguage } from "@/lib/i18n";
 
 export function AuditLogViewer() {
+  const { t } = useLanguage();
   const [logs, setLogs] = useState<AuditEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,11 +65,11 @@ export function AuditLogViewer() {
           </div>
           <div>
             <h3 className="text-sm sm:text-base font-bold text-primary-text flex items-center space-x-2">
-              <span>Audit Trail</span>
-              <Badge variant="teal">Immutable Record</Badge>
+              <span>{t.auditTrail}</span>
+              <Badge variant="teal">{t.immutableRecord}</Badge>
             </h3>
             <p className="text-xs text-secondary-text mt-0.5 font-medium">
-              Verified operational events recorded for accountability and compliance.
+              {t.auditSubtitle}
             </p>
           </div>
         </div>
@@ -78,7 +80,7 @@ export function AuditLogViewer() {
             <Search className="w-4 h-4 absolute left-3 top-2.5 text-secondary-text" />
             <input
               type="text"
-              placeholder="Search events..."
+              placeholder={t.searchEvents}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 pr-3 py-1.5 text-xs bg-page rounded-xl border border-card-border text-primary-text placeholder:text-secondary-text placeholder:opacity-80 focus:outline-none focus:border-teal font-medium"
@@ -90,7 +92,7 @@ export function AuditLogViewer() {
             onChange={(e) => setSelectedActor(e.target.value)}
             className="px-3 py-1.5 text-xs bg-page rounded-xl border border-card-border text-primary-text font-bold focus:outline-none focus:border-teal cursor-pointer"
           >
-            <option value="all">All Actors</option>
+            <option value="all">{t.allActors}</option>
             <option value="agent">Agent</option>
             <option value="human">Human</option>
             <option value="system">System</option>
@@ -103,11 +105,11 @@ export function AuditLogViewer() {
         <table className="w-full text-left text-xs">
           <thead>
             <tr className="border-b border-card-border text-xs font-bold text-primary-text uppercase bg-page/50">
-              <th className="py-3 px-3.5">Timestamp</th>
-              <th className="py-3 px-3.5">Actor</th>
-              <th className="py-3 px-3.5">Action</th>
-              <th className="py-3 px-3.5">Status</th>
-              <th className="py-3 px-3.5 text-right">Details</th>
+              <th className="py-3 px-3.5">{t.timestamp}</th>
+              <th className="py-3 px-3.5">{t.actor}</th>
+              <th className="py-3 px-3.5">{t.action}</th>
+              <th className="py-3 px-3.5">{t.status}</th>
+              <th className="py-3 px-3.5 text-right">{t.details}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-card-border">

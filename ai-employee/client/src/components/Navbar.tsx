@@ -299,7 +299,7 @@ export function Navbar() {
                         className="w-full text-left px-3.5 py-2 text-xs font-bold text-secondary-text hover:bg-highlight/30 dark:hover:bg-teal/20 hover:text-primary-text flex items-center space-x-2 transition-colors"
                       >
                         <Settings className="w-3.5 h-3.5" />
-                        <span>Settings</span>
+                        <span>{t.settings}</span>
                       </Link>
                       <button
                         onClick={() => {
@@ -309,7 +309,7 @@ export function Navbar() {
                         className="w-full text-left px-3.5 py-2 text-xs font-bold text-error hover:bg-error/10 flex items-center space-x-2 transition-colors"
                       >
                         <LogOut className="w-3.5 h-3.5" />
-                        <span>Sign Out</span>
+                        <span>{t.signOut}</span>
                       </button>
                     </div>
                   )}

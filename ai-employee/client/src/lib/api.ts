@@ -235,7 +235,7 @@ let localAuditEvents: AuditEvent[] = [
 async function fetchWithFallback<T>(url: string, options?: RequestInit, fallback?: () => T): Promise<T> {
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000);
+    const timeout = setTimeout(() => controller.abort(), 10000);
     const res = await fetch(`${API_BASE_URL}${url}`, {
       ...options,
       headers: {

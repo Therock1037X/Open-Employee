@@ -166,7 +166,7 @@ export default function DashboardPage() {
               {t.greeting}
             </h1>
             <p className="text-xs sm:text-sm text-secondary-text font-medium mt-1">
-              {t.todaySummary} &bull; <span className="text-success font-bold">Store active</span>
+              {t.todaySummary} &bull; <span className="text-success font-bold">{t.storeActive}</span>
             </p>
           </div>
 
@@ -176,7 +176,7 @@ export default function DashboardPage() {
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-success"></span>
             </span>
             <span className="text-xs font-bold text-primary-text">
-              Autonomous Agent: Running
+              {t.agentRunning}
             </span>
           </div>
         </div>
@@ -204,7 +204,7 @@ export default function DashboardPage() {
             <div className="mt-3 flex items-center justify-between">
               <div className="text-[11px] text-success flex items-center space-x-1 font-bold">
                 <ArrowUpRight className="w-3.5 h-3.5 stroke-[3]" />
-                <span>+24% vs yesterday</span>
+                <span>{t.vsYesterday}</span>
               </div>
               <Sparkline data={[1200, 1900, 2400, 3100, 2800, 3900, 4250]} color="green" />
             </div>
@@ -220,12 +220,12 @@ export default function DashboardPage() {
             </div>
             <div className="text-2xl sm:text-3xl font-black text-primary-text flex items-baseline">
               <AnimatedNumber value={lowStockCount || 2} />
-              <span className="text-xs font-bold text-secondary-text ml-2">Items Low</span>
+              <span className="text-xs font-bold text-secondary-text ml-2">{t.itemsLow}</span>
             </div>
             <div className="mt-3 flex items-center justify-between">
               <span className="text-[11px] text-error font-bold flex items-center space-x-1">
                 <AlertTriangle className="w-3.5 h-3.5" />
-                <span>Reorder queued</span>
+                <span>{t.reorderQueued}</span>
               </span>
               <Sparkline data={[5, 4, 4, 3, 2, 2, 2]} color="red" />
             </div>
@@ -241,11 +241,11 @@ export default function DashboardPage() {
             </div>
             <div className="text-2xl sm:text-3xl font-black text-primary-text flex items-baseline">
               <AnimatedNumber value={3} />
-              <span className="text-xs font-bold text-secondary-text ml-2">Pending Sign-off</span>
+              <span className="text-xs font-bold text-secondary-text ml-2">{t.pendingSignOff}</span>
             </div>
             <div className="mt-3 flex items-center justify-between">
               <span className="text-[11px] text-teal dark:text-skyblue font-bold">
-                Protection Active
+                {t.protectionActive}
               </span>
               <Sparkline data={[1, 2, 1, 3, 2, 4, 3]} color="teal" />
             </div>
@@ -265,7 +265,7 @@ export default function DashboardPage() {
             <div className="mt-3 flex items-center justify-between">
               <div className="text-[11px] text-success flex items-center space-x-1 font-bold">
                 <ArrowDownRight className="w-3.5 h-3.5 stroke-[3]" />
-                <span>-62% vs last week</span>
+                <span>{t.vsLastWeek}</span>
               </div>
               <Sparkline data={[400, 350, 300, 250, 200, 150]} color="green" />
             </div>
@@ -288,7 +288,7 @@ export default function DashboardPage() {
                     {t.hourlyTrend}
                   </h3>
                   <p className="text-xs text-secondary-text mt-0.5 font-medium">
-                    Transaction volume across UPI and cash payments
+                    {t.chartSubtitle}
                   </p>
                 </div>
 
@@ -304,7 +304,7 @@ export default function DashboardPage() {
                           : "text-secondary-text hover:text-primary-text"
                       }`}
                     >
-                      {range === "7d" ? "7 Days" : range === "30d" ? "30 Days" : "1 Year"}
+                      {range === "7d" ? t.sevenDays : range === "30d" ? t.thirtyDays : t.oneYear}
                     </button>
                   ))}
                 </div>
@@ -386,7 +386,7 @@ export default function DashboardPage() {
                     {t.topProducts}
                   </h3>
                 </div>
-                <Badge variant="teal">This Month</Badge>
+                <Badge variant="teal">{t.thisMonth}</Badge>
               </div>
 
               <div className="space-y-3.5">
@@ -431,7 +431,7 @@ export default function DashboardPage() {
                   <div>
                     <h3 className="text-sm font-extrabold text-primary-text">{t.agentFeed}</h3>
                     <p className="text-[11px] text-secondary-text font-medium">
-                      Continuous background reasoning
+                      {t.agentFeedSubtitle}
                     </p>
                   </div>
                 </div>
@@ -445,7 +445,7 @@ export default function DashboardPage() {
               <div className="p-3.5 rounded-xl bg-page border border-card-border mb-4 text-xs font-mono text-primary-text leading-relaxed">
                 <div className="flex items-center space-x-1.5 text-teal dark:text-skyblue font-bold mb-1">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>Agent Thought Stream</span>
+                  <span>{t.agentThoughtStream}</span>
                 </div>
                 <p className="text-secondary-text">
                   {agentLiveTyping}
@@ -484,7 +484,7 @@ export default function DashboardPage() {
 
                         <div className="flex items-center justify-between mt-2">
                           <span className="text-[11px] text-secondary-text">
-                            Actor: <strong className="text-primary-text">{log.actor}</strong>
+                            {t.actor}: <strong className="text-primary-text">{log.actor}</strong>
                           </span>
 
                           {/* Status Chips */}
@@ -497,7 +497,7 @@ export default function DashboardPage() {
                                 : "bg-card-border text-secondary-text"
                             }`}
                           >
-                            {isApproval ? "waiting approval" : isDone ? "done" : "running"}
+                            {isApproval ? t.waitingApproval : isDone ? t.done : t.running}
                           </span>
                         </div>
                       </div>

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { useToast } from "@/components/ui/Toast";
 import { useTheme } from "@/lib/theme-context";
+import { useLanguage } from "@/lib/i18n";
 import {
   Settings as SettingsIcon,
   Store,
@@ -20,6 +21,7 @@ import {
 export default function SettingsPage() {
   const { toast } = useToast();
   const { theme, toggleTheme } = useTheme();
+  const { t } = useLanguage();
   const [storeName, setStoreName] = useState("Open Employee MSME Mart");
   const [upiVpa, setUpiVpa] = useState("openemployee@icici");
   const [ownerPhone, setOwnerPhone] = useState("+91 98765 43210");
@@ -47,9 +49,9 @@ export default function SettingsPage() {
             <SettingsIcon className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-primary-text tracking-tight">System Settings</h1>
+            <h1 className="text-xl sm:text-2xl font-black text-primary-text tracking-tight">{t.systemSettings}</h1>
             <p className="text-xs text-secondary-text mt-0.5 font-medium">
-              Shop profile, approval guardrail thresholds, and interface appearance.
+              {t.settingsSubtitle}
             </p>
           </div>
         </div>
@@ -59,7 +61,7 @@ export default function SettingsPage() {
           <Card className="p-6 space-y-4">
             <div className="flex items-center space-x-2 pb-2 border-b border-card-border">
               <Store className="w-4 h-4 text-teal dark:text-skyblue" />
-              <h2 className="text-sm font-bold text-primary-text">Shop Profile</h2>
+              <h2 className="text-sm font-bold text-primary-text">{t.shopProfile}</h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -181,7 +183,7 @@ export default function SettingsPage() {
               isLoading={isSaving}
               icon={<Save className="w-4 h-4" />}
             >
-              Save Settings
+              {t.saveSettings}
             </Button>
           </div>
         </form>

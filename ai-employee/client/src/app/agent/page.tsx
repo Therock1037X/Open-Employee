@@ -13,6 +13,7 @@ import { VoiceCallScreen } from "@/components/VoiceCallScreen";
 import { Timeline, TaskTimelineStatus } from "@/components/ui/Timeline";
 import { MobileTabBar } from "@/components/ui/MobileTabBar";
 import { useToast } from "@/components/ui/Toast";
+import { useLanguage } from "@/lib/i18n";
 import {
   ShieldCheck,
   ClipboardList,
@@ -35,6 +36,7 @@ interface AgentActiveTask {
 
 export default function AgentPage() {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("voice");
   const [testingVoice, setTestingVoice] = useState(false);
 
@@ -70,10 +72,10 @@ export default function AgentPage() {
   ];
 
   const tabItems: TabItem[] = [
-    { id: "voice", label: "Telephony & Voice", icon: <PhoneCall className="w-4 h-4" /> },
-    { id: "tasks", label: "Task Timelines", icon: <GitBranch className="w-4 h-4" />, badge: "4" },
-    { id: "approvals", label: "Approvals Gate", icon: <ShieldCheck className="w-4 h-4" />, badge: "3" },
-    { id: "audit", label: "Audit Ledger", icon: <ClipboardList className="w-4 h-4" /> },
+    { id: "voice", label: t.voiceCalls, icon: <PhoneCall className="w-4 h-4" /> },
+    { id: "tasks", label: t.pipelines, icon: <GitBranch className="w-4 h-4" />, badge: "4" },
+    { id: "approvals", label: t.approvals, icon: <ShieldCheck className="w-4 h-4" />, badge: "3" },
+    { id: "audit", label: t.auditTrail, icon: <ClipboardList className="w-4 h-4" /> },
     { id: "system", label: "System & Tools", icon: <Cpu className="w-4 h-4" /> },
   ];
 
@@ -106,7 +108,7 @@ export default function AgentPage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-success"></span>
             </span>
-            <Badge variant="teal">Autonomous Worker: Active</Badge>
+            <Badge variant="teal">{t.autonomousWorkerActive}</Badge>
           </div>
         </div>
 

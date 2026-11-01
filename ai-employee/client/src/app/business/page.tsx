@@ -11,6 +11,7 @@ import { Modal } from "@/components/ui/Modal";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { RazorpayUPIModal } from "@/components/RazorpayUPIModal";
 import { useToast } from "@/components/ui/Toast";
+import { useLanguage } from "@/lib/i18n";
 import { api, Sale, StockItem, FinanceSummary, WhatsAppInboxItem } from "@/lib/api";
 import { CheckCheck, FileText, Image as ImageIcon } from "lucide-react";
 import {
@@ -26,6 +27,7 @@ import {
 
 export default function BusinessPage() {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("sales");
   const [sales, setSales] = useState<Sale[]>([]);
   const [stock, setStock] = useState<StockItem[]>([]);
@@ -168,15 +170,15 @@ export default function BusinessPage() {
   };
 
   const tabItems: TabItem[] = [
-    { id: "sales", label: "Sales", icon: <TrendingUp className="w-4 h-4" />, badge: sales.length },
+    { id: "sales", label: t.salesTab, icon: <TrendingUp className="w-4 h-4" />, badge: sales.length },
     {
       id: "stock",
       label: "Stock",
       icon: <Package className="w-4 h-4" />,
       badge: stock.filter((s) => s.is_low_stock).length || undefined,
     },
-    { id: "finance", label: "Finance & UPI", icon: <Wallet className="w-4 h-4" /> },
-    { id: "marketing", label: "Marketing", icon: <Megaphone className="w-4 h-4" /> },
+    { id: "finance", label: t.financeTab, icon: <Wallet className="w-4 h-4" /> },
+    { id: "marketing", label: t.marketingTab, icon: <Megaphone className="w-4 h-4" /> },
   ];
 
   return (
@@ -203,7 +205,7 @@ export default function BusinessPage() {
                 onClick={() => setSaleModalOpen(true)}
                 icon={<Plus className="w-4 h-4" />}
               >
-                Record Sale
+                {t.newSale}
               </Button>
             )}
             {activeTab === "stock" && (
@@ -213,7 +215,7 @@ export default function BusinessPage() {
                 onClick={() => setStockModalOpen(true)}
                 icon={<Plus className="w-4 h-4" />}
               >
-                Add Stock
+                {t.addStock}
               </Button>
             )}
             {activeTab === "finance" && (
@@ -223,7 +225,7 @@ export default function BusinessPage() {
                 onClick={() => setUpiModalOpen(true)}
                 icon={<QrCode className="w-4 h-4" />}
               >
-                Collect UPI
+                {t.upiCheckout}
               </Button>
             )}
           </div>
@@ -237,7 +239,7 @@ export default function BusinessPage() {
           <div className="space-y-6">
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
               <Card animateIndex={0}>
-                <div className="text-xs text-secondary-text font-bold mb-1">Today Revenue</div>
+                <div className="text-xs text-secondary-text font-bold mb-1">{t.todaySales}</div>
                 <div className="text-2xl font-black text-primary-text">
                   <AnimatedNumber value={finance?.today_revenue || 425} prefix="₹" decimals={2} />
                 </div>

@@ -17,6 +17,7 @@ import { api, ApprovalTask } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { useToast } from "@/components/ui/Toast";
+import { useLanguage } from "@/lib/i18n";
 
 interface ApprovalGateProps {
   onApprovalResolved?: () => void;
@@ -24,6 +25,7 @@ interface ApprovalGateProps {
 
 export function ApprovalGate({ onApprovalResolved }: ApprovalGateProps) {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
   const [tasks, setTasks] = useState<ApprovalTask[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,8 +91,8 @@ export function ApprovalGate({ onApprovalResolved }: ApprovalGateProps) {
           </div>
           <div>
             <h3 className="text-sm sm:text-base font-bold text-primary-text flex items-center space-x-2">
-              <span>Approval Gate</span>
-              <Badge variant="teal">Sign-off Required</Badge>
+              <span>{t.approvals}</span>
+              <Badge variant="teal">{t.pendingSignOff}</Badge>
             </h3>
             <p className="text-xs text-secondary-text mt-0.5 font-medium">
               Review and authorize supplier calls, large payouts, or customer broadcasts.
@@ -185,7 +187,7 @@ export function ApprovalGate({ onApprovalResolved }: ApprovalGateProps) {
                         disabled={processingId === task.id}
                         icon={<X className="w-4 h-4" />}
                       >
-                        Reject
+                        {t.reject}
                       </Button>
                       <Button
                         variant="success"
@@ -195,7 +197,7 @@ export function ApprovalGate({ onApprovalResolved }: ApprovalGateProps) {
                         isLoading={processingId === task.id}
                         icon={<Check className="w-4 h-4" />}
                       >
-                        Approve
+                        {t.approve}
                       </Button>
                     </>
                   ) : (

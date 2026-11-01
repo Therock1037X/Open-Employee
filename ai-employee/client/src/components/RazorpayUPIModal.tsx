@@ -5,6 +5,7 @@ import { QrCode, CheckCircle2, X, Copy, Check, RefreshCw, ExternalLink, Smartpho
 import { api, UPIOrder } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { useLanguage } from "@/lib/i18n";
 import { useToast } from "@/components/ui/Toast";
 
 interface RazorpayUPIModalProps {
@@ -21,6 +22,7 @@ export function RazorpayUPIModal({
   onClose,
 }: RazorpayUPIModalProps) {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [amount, setAmount] = useState(initialAmount.toString());
   const [customerName, setCustomerName] = useState(initialCustomer);
   const [note, setNote] = useState("Store Billing");
@@ -85,11 +87,11 @@ export function RazorpayUPIModal({
           </div>
           <div>
             <h3 className="text-sm sm:text-base font-bold text-primary-text flex items-center space-x-2">
-              <span>Razorpay UPI Checkout</span>
-              <Badge variant="teal">Instant Settlement</Badge>
+              <span>{t.upiCheckout}</span>
+              <Badge variant="teal">{t.instantSettlement}</Badge>
             </h3>
             <p className="text-xs text-secondary-text mt-0.5 font-medium">
-              Scan with GPay, PhonePe, Paytm, BHIM, or any UPI app
+              {t.scanSubtitle}
             </p>
           </div>
         </div>
@@ -110,7 +112,7 @@ export function RazorpayUPIModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold text-primary-text block mb-1">
-                Amount (₹ INR)
+                {t.amountLabel}
               </label>
               <div className="relative">
                 <span className="absolute left-3.5 top-2.5 text-teal dark:text-skyblue font-black">₹</span>
@@ -126,7 +128,7 @@ export function RazorpayUPIModal({
 
             <div>
               <label className="text-xs font-bold text-primary-text block mb-1">
-                Customer Name
+                {t.customerNameLabel}
               </label>
               <input
                 type="text"
@@ -140,7 +142,7 @@ export function RazorpayUPIModal({
 
           <div>
             <label className="text-xs font-bold text-primary-text block mb-1">
-              Payment Reference Note
+              {t.noteLabel}
             </label>
             <input
               type="text"
@@ -160,7 +162,7 @@ export function RazorpayUPIModal({
             className="w-full"
             icon={<QrCode className="w-4 h-4" />}
           >
-            Generate Scannable Razorpay QR
+            {t.generateQr}
           </Button>
         </div>
       ) : (
@@ -170,12 +172,12 @@ export function RazorpayUPIModal({
               <div className="w-14 h-14 rounded-full bg-success/20 text-success border border-success/40 flex items-center justify-center">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
-              <h4 className="text-lg font-bold text-primary-text">Payment Verified</h4>
+              <h4 className="text-lg font-bold text-primary-text">{t.paymentVerified}</h4>
               <p className="text-xs font-medium text-secondary-text">
                 ₹{activeOrder.amount.toFixed(2)} received from {activeOrder.customer_name}.
               </p>
               <div className="px-3 py-1.5 rounded-lg bg-page border border-card-border text-xs font-mono font-bold text-teal dark:text-skyblue">
-                Order ID: {activeOrder.order_id}
+                {t.orderId}: {activeOrder.order_id}
               </div>
               <Button
                 variant="secondary"
@@ -185,7 +187,7 @@ export function RazorpayUPIModal({
                   setAmount("150");
                 }}
               >
-                New Payment
+                {t.newPayment}
               </Button>
             </div>
           ) : (
@@ -199,7 +201,7 @@ export function RazorpayUPIModal({
                 />
                 <div className="flex items-center space-x-2 mt-2.5 text-xs font-bold text-navy">
                   <span className="w-2 h-2 rounded-full bg-success animate-ping" />
-                  <span>Real Scannable NPCI UPI QR</span>
+                  <span>{t.realQrBadge}</span>
                 </div>
               </div>
 
@@ -221,7 +223,7 @@ export function RazorpayUPIModal({
                     className="w-full"
                     icon={<ExternalLink className="w-4 h-4" />}
                   >
-                    Open Official Razorpay Link &rarr;
+                    {t.openRazorpay} &rarr;
                   </Button>
                 </div>
               )}
@@ -240,14 +242,14 @@ export function RazorpayUPIModal({
                   onClick={copyUPIIntent}
                   icon={copied ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}
                 >
-                  {copied ? "Copied" : "Copy"}
+                  {copied ? t.copied : t.copyLink}
                 </Button>
               </div>
 
               {/* Supported Indian UPI Apps Row */}
               <div className="flex items-center space-x-2 text-[11px] font-bold text-secondary-text">
                 <Smartphone className="w-3.5 h-3.5 text-teal" />
-                <span>Supports GPay, PhonePe, Paytm, BHIM, CRED</span>
+                <span>{t.supportsApps}</span>
               </div>
 
               {/* Mock Webhook Simulator */}
@@ -261,7 +263,7 @@ export function RazorpayUPIModal({
                   icon={<RefreshCw className="w-3.5 h-3.5" />}
                   className="w-full max-w-sm"
                 >
-                  Simulate Customer Scan & Payment
+                  {t.simulatePayment}
                 </Button>
               </div>
             </div>
