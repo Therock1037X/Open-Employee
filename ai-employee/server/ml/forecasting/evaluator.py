@@ -97,3 +97,4 @@ def run_forecasting_pipeline(holdout_days: int = 60, seed: int = 42) -> Dict[str
 if __name__ == "__main__":
     report = run_forecasting_pipeline()
     print(report)
+

@@ -42,3 +42,4 @@ def test_forecasting_pipeline_target_accuracy():
         acc = details["selected_metrics"]["Accuracy"]
         assert acc >= 85.0, f"Product {prod} achieved {acc}%, which is below target 85%"
         assert details["selected_metrics"]["WAPE"] <= 15.0
+

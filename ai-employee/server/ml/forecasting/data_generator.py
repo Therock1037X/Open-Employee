@@ -61,3 +61,4 @@ def generate_sales_history(
 if __name__ == "__main__":
     df = generate_sales_history()
     print(f"Generated {len(df)} sales records across {len(PRODUCTS)} products.")
+

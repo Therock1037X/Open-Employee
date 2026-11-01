@@ -34,13 +34,88 @@ class Sale(Base):
     __tablename__ = "sales"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    sale_id = Column(String(64), unique=True, index=True, nullable=True)
     product = Column(String(255), nullable=False, index=True)
     quantity = Column(Float, nullable=False)
     price = Column(Float, nullable=False)
-    created_by = Column(String(255), nullable=False)
+    total_amount = Column(Float, nullable=True)
+    customer = Column(String(255), nullable=True, default="Walk-in Customer")
+    payment_mode = Column(String(32), default="cash")
+    created_by = Column(String(255), nullable=False, default="owner")
     raw_text = Column(Text, nullable=True)
     lang = Column(String(10), default="hi")
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+
+class Product(Base):
+    __tablename__ = "products"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    product_id = Column(String(64), unique=True, index=True)
+    name = Column(String(255), unique=True, nullable=False, index=True)
+    category = Column(String(100), default="General")
+    unit = Column(String(50), default="kg")
+    cost_price = Column(Float, default=0.0)
+    selling_price = Column(Float, default=0.0)
+    reorder_level = Column(Float, default=10.0)
+    current_stock = Column(Float, default=0.0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Customer(Base):
+    __tablename__ = "customers"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(String(64), unique=True, index=True)
+    name = Column(String(255), nullable=False, index=True)
+    phone = Column(String(32), nullable=False, index=True)
+    language = Column(String(10), default="hi")
+    credit_limit = Column(Float, default=5000.0)
+    current_balance = Column(Float, default=0.0)
+    address = Column(String(512), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Supplier(Base):
+    __tablename__ = "suppliers"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    supplier_id = Column(String(64), unique=True, index=True)
+    name = Column(String(255), nullable=False, index=True)
+    contact_person = Column(String(255), nullable=True)
+    phone = Column(String(32), nullable=False)
+    category = Column(String(100), nullable=True)
+    lead_time_days = Column(Integer, default=2)
+    address = Column(String(512), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Purchase(Base):
+    __tablename__ = "purchases"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    purchase_id = Column(String(64), unique=True, index=True)
+    supplier_id = Column(String(64), nullable=True)
+    supplier_name = Column(String(255), nullable=True)
+    product = Column(String(255), nullable=False)
+    quantity = Column(Float, nullable=False)
+    unit = Column(String(50), default="kg")
+    unit_cost = Column(Float, nullable=False)
+    total_amount = Column(Float, nullable=False)
+    status = Column(String(32), default="received")  # ordered, received, paid
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+
+class Expense(Base):
+    __tablename__ = "expenses"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    expense_id = Column(String(64), unique=True, index=True)
+    category = Column(String(100), nullable=False, index=True)
+    amount = Column(Float, nullable=False)
+    payment_mode = Column(String(50), default="cash")
+    description = Column(String(512), nullable=True)
+    date = Column(DateTime, default=datetime.utcnow, index=True)
 
 
 class Stock(Base):

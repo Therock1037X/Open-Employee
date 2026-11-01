@@ -11,3 +11,4 @@ def test_bhashini_asr_noise_stress_cases():
     assert results["accuracy"] >= 95.0, f"ASR noise accuracy was {results['accuracy']}%, expected >= 95%"
     for c in results["cases"]:
         assert c["status"] == "PASS", f"Failed on speech case: {c['input']}"
+

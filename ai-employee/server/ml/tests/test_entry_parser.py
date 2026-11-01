@@ -52,3 +52,4 @@ def test_unseen_entities_generalization():
     assert parsed.quantity == 2.0
     assert parsed.amount == 240.0
     assert parsed.customer == "Tukaram"
+

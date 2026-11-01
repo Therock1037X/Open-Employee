@@ -124,3 +124,4 @@ class XGBoostForecaster:
         test_feat = feat_df[feat_df["ds"].isin(test_dates)]
         X_test = test_feat[self.feature_cols]
         return np.maximum(0.5, self.model.predict(X_test))
+
