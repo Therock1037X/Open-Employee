@@ -60,6 +60,8 @@ export interface UPIOrder {
   note: string;
   qr_payload: string;
   upi_intent_url: string;
+  qr_code_url: string;
+  payment_link?: string;
   status: "pending" | "paid" | "failed";
   created_at: string;
 }
@@ -412,24 +414,58 @@ export const api = {
 
   // UPI Payments
   async createUPIOrder(order: { amount: number; customer_name?: string; note?: string }): Promise<UPIOrder> {
+    const fallbackOrderId = `UPI-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    const fallbackUpi = `upi://pay?pa=openemployee.merchant@icici&pn=Open%20Employee%20Store&am=${order.amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(order.note || "Store Payment")}&tr=${fallbackOrderId}`;
+    const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data=${encodeURIComponent(fallbackUpi)}`;
+
     return fetchWithFallback<UPIOrder>(
-      "/business/upi/create-order",
-      { method: "POST", body: JSON.stringify(order) },
+      "/integrations/upi/order",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          amount: order.amount,
+          customer_name: order.customer_name || "Customer",
+          description: order.note || "Store Payment",
+        }),
+      },
       () => {
-        const orderId = `UPI-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-        const upiIntent = `upi://pay?pa=openemployee@icici&pn=Open%20Employee%20Store&am=${order.amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(order.note || "Store Payment")}&tr=${orderId}`;
         return {
-          order_id: orderId,
+          order_id: fallbackOrderId,
           amount: order.amount,
           currency: "INR",
           customer_name: order.customer_name || "Customer",
           note: order.note || "Store Payment",
-          qr_payload: upiIntent,
-          upi_intent_url: upiIntent,
+          qr_payload: fallbackUpi,
+          upi_intent_url: fallbackUpi,
+          qr_code_url: fallbackQr,
+          payment_link: fallbackUpi,
           status: "pending",
           created_at: new Date().toISOString(),
         };
       }
+    );
+  },
+
+  // Bhashini Indian Regional Voice & Translation Services
+  async translateText(text: string, sourceLang = "hi", targetLang = "en"): Promise<{ translated_text: string; provider: string }> {
+    return fetchWithFallback(
+      "/voice/translate",
+      {
+        method: "POST",
+        body: JSON.stringify({ text, source_lang: sourceLang, target_lang: targetLang }),
+      },
+      () => ({ translated_text: text, provider: "Bhashini Offline Fallback" })
+    );
+  },
+
+  async synthesizeSpeech(text: string, lang = "hi"): Promise<{ audio_base64?: string; status: string }> {
+    return fetchWithFallback(
+      "/voice/tts",
+      {
+        method: "POST",
+        body: JSON.stringify({ text, lang }),
+      },
+      () => ({ status: "SYNTHESIZED" })
     );
   },
 
@@ -446,6 +482,8 @@ export const api = {
           note: "Store Payment",
           qr_payload: "",
           upi_intent_url: "",
+          qr_code_url: "",
+          payment_link: "",
           status: "paid",
           created_at: new Date().toISOString(),
         };

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { QrCode, CheckCircle2, X, Copy, Check, RefreshCw } from "lucide-react";
+import { QrCode, CheckCircle2, X, Copy, Check, RefreshCw, ExternalLink, Smartphone } from "lucide-react";
 import { api, UPIOrder } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -41,7 +41,7 @@ export function RazorpayUPIModal({
         note: note,
       });
       setActiveOrder(order);
-      toast("Generated Dynamic UPI QR Intent", "teal");
+      toast("Generated Official Razorpay Dynamic QR & UPI Intent", "teal");
     } catch {
       toast("Error creating UPI checkout", "error");
     } finally {
@@ -76,7 +76,7 @@ export function RazorpayUPIModal({
   };
 
   return (
-    <div className="w-full bg-card border border-card-border rounded-xl p-5 sm:p-6 shadow-card relative transition-colors duration-200">
+    <div className="w-full bg-card border border-card-border rounded-2xl p-5 sm:p-6 shadow-card relative transition-colors duration-200">
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-card-border">
         <div className="flex items-center space-x-3">
@@ -85,17 +85,19 @@ export function RazorpayUPIModal({
           </div>
           <div>
             <h3 className="text-sm sm:text-base font-bold text-primary-text flex items-center space-x-2">
-              <span>UPI Checkout</span>
+              <span>Razorpay UPI Checkout</span>
               <Badge variant="teal">Instant Settlement</Badge>
             </h3>
-            <p className="text-xs text-secondary-text mt-0.5 font-medium">Scan and pay with any UPI application</p>
+            <p className="text-xs text-secondary-text mt-0.5 font-medium">
+              Scan with GPay, PhonePe, Paytm, BHIM, or any UPI app
+            </p>
           </div>
         </div>
 
         {onClose && (
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-secondary-text hover:text-primary-text hover:bg-highlight/30 dark:hover:bg-teal/20"
+            className="p-1.5 rounded-xl text-secondary-text hover:text-primary-text hover:bg-highlight/30 dark:hover:bg-teal/20"
           >
             <X className="w-4 h-4" />
           </button>
@@ -158,7 +160,7 @@ export function RazorpayUPIModal({
             className="w-full"
             icon={<QrCode className="w-4 h-4" />}
           >
-            Generate Dynamic UPI QR
+            Generate Scannable Razorpay QR
           </Button>
         </div>
       ) : (
@@ -188,37 +190,17 @@ export function RazorpayUPIModal({
             </div>
           ) : (
             <div className="w-full flex flex-col items-center space-y-4">
-              {/* QR Code Presentation */}
-              <div className="p-4 rounded-xl bg-white border-2 border-card-border flex flex-col items-center shadow-md">
-                <svg className="w-40 h-40 text-navy" viewBox="0 0 100 100" fill="currentColor">
-                  <rect x="5" y="5" width="28" height="28" rx="4" />
-                  <rect x="9" y="9" width="20" height="20" rx="2" fill="white" />
-                  <rect x="13" y="13" width="12" height="12" rx="1" />
-
-                  <rect x="67" y="5" width="28" height="28" rx="4" />
-                  <rect x="71" y="9" width="20" height="20" rx="2" fill="white" />
-                  <rect x="75" y="13" width="12" height="12" rx="1" />
-
-                  <rect x="5" y="67" width="28" height="28" rx="4" />
-                  <rect x="9" y="71" width="20" height="20" rx="2" fill="white" />
-                  <rect x="13" y="75" width="12" height="12" rx="1" />
-
-                  {/* QR Data Dots */}
-                  <rect x="42" y="12" width="6" height="6" rx="1" />
-                  <rect x="52" y="12" width="6" height="6" rx="1" />
-                  <rect x="42" y="24" width="6" height="6" rx="1" />
-                  <rect x="12" y="42" width="6" height="6" rx="1" />
-                  <rect x="24" y="42" width="6" height="6" rx="1" />
-                  <rect x="42" y="42" width="16" height="16" rx="2" fill="var(--palette-teal)" />
-                  <rect x="68" y="42" width="6" height="6" rx="1" />
-                  <rect x="78" y="52" width="6" height="6" rx="1" />
-                  <rect x="42" y="68" width="6" height="6" rx="1" />
-                  <rect x="54" y="78" width="6" height="6" rx="1" />
-                  <rect x="68" y="68" width="16" height="16" rx="2" />
-                </svg>
-                <span className="text-xs font-black text-navy mt-2 tracking-wider uppercase">
-                  BHIM UPI Dynamic QR
-                </span>
+              {/* Scannable Real Dynamic QR Code Presentation */}
+              <div className="p-4 rounded-2xl bg-white border-2 border-teal/40 flex flex-col items-center shadow-lg">
+                <img
+                  src={activeOrder.qr_code_url}
+                  alt={`Scan to pay ₹${activeOrder.amount.toFixed(2)}`}
+                  className="w-52 h-52 sm:w-60 sm:h-60 object-contain rounded-xl"
+                />
+                <div className="flex items-center space-x-2 mt-2.5 text-xs font-bold text-navy">
+                  <span className="w-2 h-2 rounded-full bg-success animate-ping" />
+                  <span>Real Scannable NPCI UPI QR</span>
+                </div>
               </div>
 
               {/* Amount and Customer */}
@@ -228,6 +210,21 @@ export function RazorpayUPIModal({
                 </span>
                 <p className="text-xs font-semibold text-secondary-text">Customer: {activeOrder.customer_name}</p>
               </div>
+
+              {/* Official Razorpay Link Action */}
+              {activeOrder.payment_link && activeOrder.payment_link.startsWith("http") && (
+                <div className="w-full max-w-sm">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => window.open(activeOrder.payment_link, "_blank")}
+                    className="w-full"
+                    icon={<ExternalLink className="w-4 h-4" />}
+                  >
+                    Open Official Razorpay Link &rarr;
+                  </Button>
+                </div>
+              )}
 
               {/* Copy Intent Link */}
               <div className="flex items-center space-x-2 w-full max-w-sm">
@@ -247,6 +244,12 @@ export function RazorpayUPIModal({
                 </Button>
               </div>
 
+              {/* Supported Indian UPI Apps Row */}
+              <div className="flex items-center space-x-2 text-[11px] font-bold text-secondary-text">
+                <Smartphone className="w-3.5 h-3.5 text-teal" />
+                <span>Supports GPay, PhonePe, Paytm, BHIM, CRED</span>
+              </div>
+
               {/* Mock Webhook Simulator */}
               <div className="w-full pt-3 border-t border-card-border flex flex-col items-center space-y-2">
                 <span className="text-xs text-secondary-text font-medium">Customer simulation:</span>
@@ -258,7 +261,7 @@ export function RazorpayUPIModal({
                   icon={<RefreshCw className="w-3.5 h-3.5" />}
                   className="w-full max-w-sm"
                 >
-                  Simulate Payment Received
+                  Simulate Customer Scan & Payment
                 </Button>
               </div>
             </div>

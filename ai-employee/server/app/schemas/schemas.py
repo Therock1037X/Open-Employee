@@ -191,6 +191,7 @@ class UPIOrderResponse(BaseModel):
     upi_link: str
     qr_code_url: str
     status: str
+    payment_link: Optional[str] = None
 
 
 # --- Voice, Memory & Audit Schemas (User 4) ---

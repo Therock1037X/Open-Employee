@@ -295,6 +295,7 @@ def create_upi_checkout(
         amount=res["amount"],
         upi_link=res["upi_link"],
         qr_code_url=res["qr_code_url"],
+        payment_link=res.get("payment_link"),
         status=res["status"],
     )
 

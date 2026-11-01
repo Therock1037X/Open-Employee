@@ -31,7 +31,7 @@ export function Navbar() {
   const pathname = usePathname();
   const { user, logOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, t, languages } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
 
   const [langMenuOpen, setLangMenuOpen] = useState(false);
@@ -70,14 +70,8 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const languageOptions: { code: LanguageCode; name: string }[] = [
-    { code: "en", name: "English" },
-    { code: "hi", name: "हिन्दी (Hindi)" },
-    { code: "mr", name: "मराठी (Marathi)" },
-  ];
-
-  const currentLangLabel =
-    languageOptions.find((l) => l.code === language)?.name.split(" ")[0] || "English";
+  const currentLangObj = languages.find((l) => l.code === language) || languages[0];
+  const currentLangLabel = currentLangObj.native;
 
   // 4 Primary navigation items
   const navLinks = [
@@ -226,11 +220,11 @@ export function Navbar() {
                 </button>
 
                 {langMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-card border border-card-border shadow-xl py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-56 max-h-72 overflow-y-auto rounded-2xl bg-card border border-card-border shadow-xl py-2 z-50">
                     <div className="px-3.5 py-1 border-b border-card-border text-[10px] uppercase font-extrabold text-secondary-text">
-                      Language / भाषा
+                      Bhashini Languages / भाषा
                     </div>
-                    {languageOptions.map((lang) => (
+                    {languages.map((lang) => (
                       <button
                         key={lang.code}
                         onClick={() => {
@@ -239,9 +233,14 @@ export function Navbar() {
                         }}
                         className="w-full text-left px-3.5 py-2 text-xs font-semibold text-secondary-text hover:bg-highlight/30 dark:hover:bg-teal/20 hover:text-primary-text flex items-center justify-between transition-colors"
                       >
-                        <span className={language === lang.code ? "text-teal dark:text-skyblue font-extrabold" : "text-primary-text"}>
-                          {lang.name}
-                        </span>
+                        <div className="flex items-center space-x-1.5">
+                          <span className={language === lang.code ? "text-teal dark:text-skyblue font-extrabold" : "text-primary-text"}>
+                            {lang.native}
+                          </span>
+                          <span className="text-[10px] text-secondary-text">
+                            ({lang.name})
+                          </span>
+                        </div>
                         {language === lang.code && (
                           <span className="w-2 h-2 rounded-full bg-teal" />
                         )}

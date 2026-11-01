@@ -190,3 +190,39 @@ async def trigger_supplier_voice_call(
         simulated_transcript=res["simulated_transcript"],
         outcome=res["outcome"],
     )
+
+
+@router.get("/languages")
+def get_supported_regional_languages():
+    """
+    Returns all 10 major Indian regional languages powered by Bhashini AI.
+    """
+    return [
+        {"code": "hi", "name": "Hindi", "native": "हिन्दी", "script": "Devanagari"},
+        {"code": "mr", "name": "Marathi", "native": "मराठी", "script": "Devanagari"},
+        {"code": "gu", "name": "Gujarati", "native": "ગુજરાતી", "script": "Gujarati"},
+        {"code": "ta", "name": "Tamil", "native": "தமிழ்", "script": "Tamil"},
+        {"code": "te", "name": "Telugu", "native": "తెలుగు", "script": "Telugu"},
+        {"code": "kn", "name": "Kannada", "native": "ಕನ್ನಡ", "script": "Kannada"},
+        {"code": "ml", "name": "Malayalam", "native": "മലയാളം", "script": "Malayalam"},
+        {"code": "bn", "name": "Bengali", "native": "বাংলা", "script": "Bengali"},
+        {"code": "pa", "name": "Punjabi", "native": "ਪੰਜਾਬੀ", "script": "Gurmukhi"},
+        {"code": "en", "name": "English", "native": "English", "script": "Latin"},
+    ]
+
+
+@router.post("/tts")
+async def bhashini_tts_alias(payload: Dict[str, Any] = Body(...)):
+    """Standard alias for Bhashini Text-to-Speech synthesis."""
+    text = payload.get("text", "")
+    lang = payload.get("lang", "hi")
+    gender = payload.get("gender", "female")
+    return await bhashini_service.run_tts(text=text, lang=lang, gender=gender)
+
+
+@router.post("/asr")
+async def bhashini_asr_alias(payload: Dict[str, Any] = Body(...)):
+    """Standard alias for Bhashini Automatic Speech Recognition."""
+    audio_base64 = payload.get("audio_base64", "")
+    lang = payload.get("lang", "hi")
+    return await bhashini_service.run_asr(audio_content_base64=audio_base64, lang=lang)
