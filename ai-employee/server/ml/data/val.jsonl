@@ -1,0 +1,38 @@
+{"text": "Vikas ne 25.0 kg aata liya cash 3400.0", "label": {"intent": "sale", "product": "Wheat Flour", "quantity": 25.0, "unit": "kg", "amount": 3400.0, "customer": "Vikas", "language": "hi"}}
+{"text": "2.0 kg arhar dal becha Rajesh ko 204.0 rupaye me", "label": {"intent": "sale", "product": "Tur Dal", "quantity": 2.0, "unit": "kg", "amount": 204.0, "customer": "Rajesh", "language": "hi"}}
+{"text": "Praveen ko 3.0 kg chini diya 402.0 rs", "label": {"intent": "sale", "product": "Sugar", "quantity": 3.0, "unit": "kg", "amount": 402.0, "customer": "Praveen", "language": "hi"}}
+{"text": "check stock of arhar dal", "label": {"intent": "stock_check", "product": "Tur Dal", "quantity": null, "unit": null, "amount": null, "customer": null, "language": "hi"}}
+{"text": "1.0 kg chini vikla Ramesh la 87.0 rs", "label": {"intent": "sale", "product": "Sugar", "quantity": 1.0, "unit": "kg", "amount": 87.0, "customer": "Ramesh", "language": "mr"}}
+{"text": "Praveen ji ko 1.0 kg tandool de diya 47.0 rs", "label": {"intent": "sale", "product": "Rice", "quantity": 1.0, "unit": "kg", "amount": 47.0, "customer": "Praveen", "language": "hi"}}
+{"text": "3.0 kg arhar dal becha Suresh ko 588.0 rupaye me", "label": {"intent": "sale", "product": "Tur Dal", "quantity": 3.0, "unit": "kg", "amount": 588.0, "customer": "Suresh", "language": "hi"}}
+{"text": "godown me 30.0 kg chai patti utra bill 5406.0 Kavita Wholesaler", "label": {"intent": "purchase", "product": "Tea Powder", "quantity": 30.0, "unit": "kg", "amount": 5406.0, "customer": "Kavita Wholesaler", "language": "hi"}}
+{"text": "godown me 10.0 kg tandool utra bill 399.5 Praveen Wholesaler", "label": {"intent": "purchase", "product": "Rice", "quantity": 10.0, "unit": "kg", "amount": 399.5, "customer": "Praveen Wholesaler", "language": "hi"}}
+{"text": "atta ka stock ktina pada hai bhai", "label": {"intent": "stock_check", "product": "Wheat Flour", "quantity": null, "unit": null, "amount": null, "customer": null, "language": "hi"}}
+{"text": "2.0packet chai ptati sold to Deepak for 254.0 rupees", "label": {"intent": "sale", "product": "Tea Powder", "quantity": 2.0, "unit": "packet", "amount": 254.0, "customer": "Deepak", "language": "hi"}}
+{"text": "Amit ko 0.5 litre milk diya 105.0 rs", "label": {"intent": "sale", "product": "Milk", "quantity": 0.5, "unit": "litre", "amount": 105.0, "customer": "Amit", "language": "hi"}}
+{"text": "Suresh la 2.0 kg rice deela 300.0 rupaye", "label": {"intent": "sale", "product": "Rice", "quantity": 2.0, "unit": "kg", "amount": 300.0, "customer": "Suresh", "language": "mr"}}
+{"text": "tandool cha kiti stock shillak ahe", "label": {"intent": "stock_check", "product": "Rice", "quantity": null, "unit": null, "amount": null, "customer": null, "language": "mr"}}
+{"text": "toor daal kitna bacha hai dukaan me", "label": {"intent": "stock_check", "product": "Tur Dal", "quantity": null, "unit": null, "amount": null, "customer": null, "language": "hi"}}
+{"text": "5.0 kg toor daal wholesale khareeda Suresh Wholesaler se 833.0 rs", "label": {"intent": "purchase", "product": "Tur Dal", "quantity": 5.0, "unit": "kg", "amount": 833.0, "customer": "Suresh Wholesaler", "language": "hi"}}
+{"text": "5.0 kg chai patti vikla Sunita la 960.0 rs", "label": {"intent": "sale", "product": "Tea Powder", "quantity": 5.0, "unit": "kg", "amount": 960.0, "customer": "Sunita", "language": "mr"}}
+{"text": "5.0 kg toor daal becha Gita ko 205.0 rupaye me", "label": {"intent": "sale", "product": "Tur Dal", "quantity": 5.0, "unit": "kg", "amount": 205.0, "customer": "Gita", "language": "hi"}}
+{"text": "Suresh Wholesaler kadun 100.0 kg atta ala 11305.0 rupaye", "label": {"intent": "purchase", "product": "Wheat Flour", "quantity": 100.0, "unit": "kg", "amount": 11305.0, "customer": "Suresh Wholesaler", "language": "mr"}}
+{"text": "dudh ka stock kitna pada hai bhai", "label": {"intent": "stock_check", "product": "Milk", "quantity": null, "unit": null, "amount": null, "customer": null, "language": "hi"}}
+{"text": "sakhar kitna bacha hai dukaan me", "label": {"intent": "stock_check", "product": "Sugar", "quantity": null, "unit": null, "amount": null, "customer": null, "language": "hi"}}
+{"text": "Kavita bhau ni 3.0 kg chai patti ghetla 636.0 di la", "label": {"intent": "sale", "product": "Tea Powder", "quantity": 3.0, "unit": "kg", "amount": 636.0, "customer": "Kavita", "language": "mr"}}
+{"text": "chawal ka stock kitna pada hai bhai", "label": {"intent": "stock_check", "product": "Rice", "quantity": null, "unit": null, "amount": null, "customer": null, "language": "hi"}}
+{"text": "atta ka stock kitna pada hai bhai", "label": {"intent": "stock_check", "product": "Wheat Flour", "quantity": null, "unit": null, "amount": null, "customer": null, "language": "hi"}}
+{"text": "Deepak ne 10.0 kg atta liya cash 1820.0", "label": {"intent": "sale", "product": "Wheat Flour", "quantity": 10.0, "unit": "kg", "amount": 1820.0, "customer": "Deepak", "language": "hi"}}
+{"text": "godown me 5.0 kg chini utra bill 433.5 Ramesh Wholesaler", "label": {"intent": "purchase", "product": "Sugar", "quantity": 5.0, "unit": "kg", "amount": 433.5, "customer": "Ramesh Wholesaler", "language": "hi"}}
+{"text": "Amit Wholesaler se 15.0 litre rai tel aayaa 2040.0 ka", "label": {"intent": "purchase", "product": "Mustard Oil", "quantity": 15.0, "unit": "litre", "amount": 2040.0, "customer": "Amit Wholesaler", "language": "hi"}}
+{"text": "godown me 10.0 packat chaha patti utra bill 1564.0 Kavita wholsealer", "label": {"intent": "purchase", "product": "Tea Powder", "quantity": 10.0, "unit": "packet", "amount": 1564.0, "customer": "Kavita Wholesaler", "language": "hi"}}
+{"text": "tea kitna bacha hai dukaan me", "label": {"intent": "stock_check", "product": "Tea Powder", "quantity": null, "unit": null, "amount": null, "customer": null, "language": "hi"}}
+{"text": "chini cha kiti istok shillak ahe", "label": {"intent": "stock_check", "product": "Sugar", "quantity": null, "unit": null, "amount": null, "customer": null, "language": "mr"}}
+{"text": "is mahine ka gstr 3b return file kardo", "label": {"intent": "file_gst", "product": null, "quantity": null, "unit": null, "amount": null, "customer": null, "language": "hi"}}
+{"text": "3.0 kg chini vikla Praveen la 402.0 rs", "label": {"intent": "sale", "product": "Sugar", "quantity": 3.0, "unit": "kg", "amount": 402.0, "customer": "Praveen", "language": "mr"}}
+{"text": "100.0 kg tandool wholesale khareeda Vikas Wholesaler se 17255.0 rs", "label": {"intent": "purchase", "product": "Rice", "quantity": 100.0, "unit": "kg", "amount": 17255.0, "customer": "Vikas Wholesaler", "language": "hi"}}
+{"text": "aata cha kiti stock shillak ahe", "label": {"intent": "stock_check", "product": "Wheat Flour", "quantity": null, "unit": null, "amount": null, "customer": null, "language": "mr"}}
+{"text": "5.0 litre sarson ka tel dukanatun Suresh la dila 520.0 rs", "label": {"intent": "sale", "product": "Mustard Oil", "quantity": 5.0, "unit": "litre", "amount": 520.0, "customer": "Suresh", "language": "mr"}}
+{"text": "goodwn me 15.0 kg chaha patti utra bill 2091.0 rmaesh Wholesaler", "label": {"intent": "purchase", "product": "Tea Powder", "quantity": 15.0, "unit": "kg", "amount": 2091.0, "customer": "Ramesh Wholesaler", "language": "hi"}}
+{"text": "deeapk bhau ni 0.5 kg atta ghetla 109.5 di la", "label": {"intent": "sale", "product": "Wheat Flour", "quantity": 0.5, "unit": "kg", "amount": 109.5, "customer": "Deepak", "language": "mr"}}
+{"text": "Mahesh ko 0.5 packet chai patti diya 46.5 rs", "label": {"intent": "sale", "product": "Tea Powder", "quantity": 0.5, "unit": "packet", "amount": 46.5, "customer": "Mahesh", "language": "hi"}}

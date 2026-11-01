@@ -1,0 +1,168 @@
+{
+  "pipeline_metadata": {
+    "fixed_seed": 42,
+    "status": "COMPLETED_SUCCESSFULLY",
+    "entry_parser_model": "Qwen/Qwen2.5-1.5B-Instruct",
+    "forecasting_models_evaluated": [
+      "Prophet",
+      "XGBoost"
+    ]
+  },
+  "entry_parser": {
+    "architecture": "QLoRA (4-bit NF4 + PEFT + TRL SFTTrainer)",
+    "hyperparameters": {
+      "learning_rate": 0.0005,
+      "lora_r": 16,
+      "lora_alpha": 32
+    },
+    "epochs": 3,
+    "early_stopping_triggered": true,
+    "retraining_iterations": 0,
+    "metrics": {
+      "exact_match_accuracy": 98.44,
+      "per_field_accuracy": {
+        "intent": 99.29,
+        "product": 99.58,
+        "quantity": 99.72,
+        "amount": 99.86,
+        "customer": 99.29
+      },
+      "confusion_matrix_by_language": {
+        "hi": {
+          "en": 32,
+          "hi": 228,
+          "mr": 150,
+          "hinglish": 19
+        },
+        "mr": {
+          "mr": 274,
+          "hinglish": 1
+        },
+        "en": {
+          "en": 1,
+          "mr": 1
+        }
+      }
+    }
+  },
+  "forecasting": {
+    "validation_strategy": "Time-based chronological split (Last 60 days strictly held out, no random shuffling)",
+    "products": {
+      "Sugar": {
+        "holdout_days": 60,
+        "prophet": {
+          "MAE": 2.37,
+          "MAPE": 6.1,
+          "WAPE": 6.06,
+          "Accuracy": 93.94
+        },
+        "xgboost": {
+          "MAE": 2.5,
+          "MAPE": 6.44,
+          "WAPE": 6.37,
+          "Accuracy": 93.63
+        },
+        "selected_model": "Prophet",
+        "selected_metrics": {
+          "MAE": 2.37,
+          "MAPE": 6.1,
+          "WAPE": 6.06,
+          "Accuracy": 93.94
+        },
+        "artifact": "sugar_best_model.joblib"
+      },
+      "Rice": {
+        "holdout_days": 60,
+        "prophet": {
+          "MAE": 1.77,
+          "MAPE": 5.84,
+          "WAPE": 5.5,
+          "Accuracy": 94.5
+        },
+        "xgboost": {
+          "MAE": 1.72,
+          "MAPE": 5.47,
+          "WAPE": 5.34,
+          "Accuracy": 94.66
+        },
+        "selected_model": "XGBoost",
+        "selected_metrics": {
+          "MAE": 1.72,
+          "MAPE": 5.47,
+          "WAPE": 5.34,
+          "Accuracy": 94.66
+        },
+        "artifact": "rice_best_model.joblib"
+      },
+      "Wheat Flour": {
+        "holdout_days": 60,
+        "prophet": {
+          "MAE": 2.51,
+          "MAPE": 4.7,
+          "WAPE": 4.55,
+          "Accuracy": 95.45
+        },
+        "xgboost": {
+          "MAE": 3.11,
+          "MAPE": 5.67,
+          "WAPE": 5.65,
+          "Accuracy": 94.35
+        },
+        "selected_model": "Prophet",
+        "selected_metrics": {
+          "MAE": 2.51,
+          "MAPE": 4.7,
+          "WAPE": 4.55,
+          "Accuracy": 95.45
+        },
+        "artifact": "wheat_flour_best_model.joblib"
+      },
+      "Mustard Oil": {
+        "holdout_days": 60,
+        "prophet": {
+          "MAE": 1.04,
+          "MAPE": 5.22,
+          "WAPE": 5.19,
+          "Accuracy": 94.81
+        },
+        "xgboost": {
+          "MAE": 1.26,
+          "MAPE": 6.19,
+          "WAPE": 6.34,
+          "Accuracy": 93.66
+        },
+        "selected_model": "Prophet",
+        "selected_metrics": {
+          "MAE": 1.04,
+          "MAPE": 5.22,
+          "WAPE": 5.19,
+          "Accuracy": 94.81
+        },
+        "artifact": "mustard_oil_best_model.joblib"
+      },
+      "Tea Powder": {
+        "holdout_days": 60,
+        "prophet": {
+          "MAE": 0.94,
+          "MAPE": 5.85,
+          "WAPE": 5.89,
+          "Accuracy": 94.11
+        },
+        "xgboost": {
+          "MAE": 1.15,
+          "MAPE": 7.23,
+          "WAPE": 7.25,
+          "Accuracy": 92.75
+        },
+        "selected_model": "Prophet",
+        "selected_metrics": {
+          "MAE": 0.94,
+          "MAPE": 5.85,
+          "WAPE": 5.89,
+          "Accuracy": 94.11
+        },
+        "artifact": "tea_powder_best_model.joblib"
+      }
+    }
+  }
+}
