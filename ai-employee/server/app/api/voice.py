@@ -1,12 +1,23 @@
-from fastapi import APIRouter, Depends, Body
+import uuid
+from typing import Dict, Any, Optional
+from datetime import datetime
+from fastapi import APIRouter, Depends, Body, HTTPException, Request
+
 from app.core.auth import verify_firebase_token
-from app.schemas.schemas import VoiceCallRequest, VoiceCallResponse
+from app.core.config import settings
+from app.core.database import SessionLocal, AuditLogRecord
+from app.schemas.schemas import (
+    VoiceCallRequest,
+    VoiceCallResponse,
+    ExotelCallRequest,
+    ExotelCallResponse,
+)
 from app.modules.voice.asr.client import bhashini_asr
 from app.modules.voice.nmt.client import bhashini_nmt
 from app.modules.voice.tts.client import bhashini_tts
 from app.modules.voice.telephony.client import exotel_client
-
 from app.modules.voice.bhashini_service import bhashini_service
+from app.modules.agent.approval_gate.gate import approval_gate
 
 router = APIRouter(prefix="/voice", tags=["voice"])
 
@@ -17,8 +28,110 @@ def ping():
         "module": "voice",
         "status": "online",
         "providers": ["bhashini_asr", "bhashini_nmt", "bhashini_tts", "exotel_telephony"],
+        "exotel_mock": exotel_client.is_mock,
+        "test_mode": settings.TEST_MODE,
         "bhashini_live_configured": bhashini_service.has_credentials(),
     }
+
+
+@router.post("/call", response_model=ExotelCallResponse)
+async def start_voice_call(
+    call_req: ExotelCallRequest,
+    current_user: dict = Depends(verify_firebase_token),
+):
+    """
+    Exotel Outbound Call:
+    Starts an outbound call from EXOTEL_NUMBER to the given phone number.
+    Returns Exotel's call SID and status.
+    Approval Gate is bypassed ONLY when TEST_MODE=true or approved=True.
+    In all other cases, requests are queued in the Approval Gate.
+    """
+    to_phone = exotel_client.normalize_phone(call_req.to)
+
+    # Check TEST_MODE flag or explicit approval
+    if settings.TEST_MODE or call_req.approved:
+        # Proceed directly with outbound call
+        res = await exotel_client.place_call(
+            to=to_phone,
+            purpose=call_req.purpose or "general",
+            script=call_req.script,
+        )
+
+        # Audit Log Entry
+        db = SessionLocal()
+        try:
+            audit = AuditLogRecord(
+                actor=current_user.get("name") or "owner",
+                action="exotel_call_started",
+                detail={
+                    "call_sid": res.get("call_sid"),
+                    "to": to_phone,
+                    "purpose": call_req.purpose,
+                    "test_mode": settings.TEST_MODE,
+                },
+                timestamp=datetime.utcnow(),
+            )
+            db.add(audit)
+            db.commit()
+        finally:
+            db.close()
+
+        return ExotelCallResponse(
+            call_sid=res.get("call_sid"),
+            sid=res.get("call_sid"),
+            status=res.get("status", "in-progress"),
+            to=to_phone,
+            from_number=res.get("from"),
+            purpose=call_req.purpose,
+            mock=res.get("mock", False),
+        )
+
+    # Route through Approval Gate
+    task_id = f"call-{uuid.uuid4().hex[:8]}"
+    approval_gate.register_for_approval(
+        task_id=task_id,
+        action="voice_call",
+        details={
+            "to": to_phone,
+            "purpose": call_req.purpose,
+            "script": call_req.script,
+        },
+        recipient=to_phone,
+    )
+
+    # Audit Log Entry for pending approval
+    db = SessionLocal()
+    try:
+        audit = AuditLogRecord(
+            actor=current_user.get("name") or "owner",
+            action="exotel_call_pending_approval",
+            detail={"task_id": task_id, "to": to_phone, "purpose": call_req.purpose},
+            timestamp=datetime.utcnow(),
+        )
+        db.add(audit)
+        db.commit()
+    finally:
+        db.close()
+
+    return ExotelCallResponse(
+        status="awaiting_approval",
+        task_id=task_id,
+        to=to_phone,
+        purpose=call_req.purpose,
+        message="Outbound call requires owner approval at Approval Gate before dialing.",
+    )
+
+
+@router.get("/call/{sid}", response_model=Dict[str, Any])
+async def get_call_status(
+    sid: str,
+    current_user: dict = Depends(verify_firebase_token),
+):
+    """
+    Checks the status and details of an Exotel call by its SID.
+    """
+    return await exotel_client.get_call_status(sid)
+
 
 
 @router.post("/transcribe")

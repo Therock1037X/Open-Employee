@@ -225,3 +225,44 @@ class AuditEvent(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# --- Exotel Telephony & SMS Schemas ---
+
+class ExotelCallRequest(BaseModel):
+    to: str
+    purpose: Optional[str] = "general"
+    script: Optional[str] = None
+    approved: bool = False
+
+
+class ExotelCallResponse(BaseModel):
+    call_sid: Optional[str] = None
+    sid: Optional[str] = None
+    status: str
+    to: Optional[str] = None
+    from_number: Optional[str] = Field(None, alias="from")
+    purpose: Optional[str] = None
+    task_id: Optional[str] = None
+    message: Optional[str] = None
+    mock: bool = False
+
+    class Config:
+        populate_by_name = True
+
+
+class ExotelSMSRequest(BaseModel):
+    to: str
+    text: str
+    approved: bool = False
+
+
+class ExotelSMSResponse(BaseModel):
+    sms_sid: Optional[str] = None
+    sid: Optional[str] = None
+    status: str
+    to: Optional[str] = None
+    task_id: Optional[str] = None
+    message: Optional[str] = None
+    mock: bool = False
+

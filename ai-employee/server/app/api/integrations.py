@@ -14,12 +14,15 @@ from app.schemas.schemas import (
     InstagramPostRequest,
     UPIOrderRequest,
     UPIOrderResponse,
+    ExotelSMSRequest,
+    ExotelSMSResponse,
 )
 from app.modules.integrations.whatsapp.client import whatsapp_client
 from app.modules.integrations.instagram.client import instagram_client
 from app.modules.integrations.indiamart.client import indiamart_client
 from app.modules.integrations.payments_upi.client import razorpay_upi
 from app.modules.integrations.finance_tools.tools import finance_tools
+from app.modules.voice.telephony.client import exotel_client
 from app.modules.agent.approval_gate.gate import approval_gate
 
 router = APIRouter(prefix="/integrations", tags=["integrations"])
@@ -306,3 +309,73 @@ def calculate_item_tax(
     Calculates GST breakdown (CGST, SGST, IGST) for an invoice amount.
     """
     return finance_tools.calculate_tax(item_category=category, taxable_value=amount, is_interstate=interstate)
+
+
+@router.post("/sms/send", response_model=ExotelSMSResponse)
+async def send_exotel_sms(
+    sms_req: ExotelSMSRequest,
+    current_user: dict = Depends(verify_firebase_token),
+):
+    """
+    Sends an outbound SMS using Exotel official API.
+    Bypasses Approval Gate only when TEST_MODE=true or approved=True.
+    In all other cases, requests are queued in the Approval Gate.
+    """
+    to_phone = exotel_client.normalize_phone(sms_req.to)
+
+    if settings.TEST_MODE or sms_req.approved:
+        res = await exotel_client.send_sms(to=to_phone, text=sms_req.text)
+        db = SessionLocal()
+        try:
+            audit = AuditLogRecord(
+                actor=current_user.get("name") or "owner",
+                action="exotel_sms_sent",
+                detail={
+                    "sms_sid": res.get("sms_sid"),
+                    "to": to_phone,
+                    "text": sms_req.text,
+                    "test_mode": settings.TEST_MODE,
+                },
+                timestamp=datetime.utcnow(),
+            )
+            db.add(audit)
+            db.commit()
+        finally:
+            db.close()
+
+        return ExotelSMSResponse(
+            sms_sid=res.get("sms_sid"),
+            sid=res.get("sms_sid"),
+            status=res.get("status", "sent"),
+            to=to_phone,
+            mock=res.get("mock", False),
+        )
+
+    task_id = f"sms-{uuid.uuid4().hex[:8]}"
+    approval_gate.register_for_approval(
+        task_id=task_id,
+        action="sms_send",
+        details={"to": to_phone, "text": sms_req.text},
+        recipient=to_phone,
+    )
+
+    db = SessionLocal()
+    try:
+        audit = AuditLogRecord(
+            actor=current_user.get("name") or "owner",
+            action="exotel_sms_pending_approval",
+            detail={"task_id": task_id, "to": to_phone, "text": sms_req.text},
+            timestamp=datetime.utcnow(),
+        )
+        db.add(audit)
+        db.commit()
+    finally:
+        db.close()
+
+    return ExotelSMSResponse(
+        status="awaiting_approval",
+        task_id=task_id,
+        to=to_phone,
+        message="Outbound SMS requires owner approval at Approval Gate before dispatch.",
+    )
+

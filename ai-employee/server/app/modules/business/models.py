@@ -166,3 +166,159 @@ class ParsedEntryResponse(BaseModel):
     amount: Optional[float] = None
     party: Optional[str] = None
     confidence: float
+
+
+# --- Product Models ---
+class ProductCreate(BaseModel):
+    name: str
+    category: str = "General"
+    unit: str = "kg"
+    cost_price: float = 0.0
+    selling_price: float = 0.0
+    reorder_level: float = 10.0
+    current_stock: float = 0.0
+
+
+class ProductUpdate(BaseModel):
+    name: Optional[str] = None
+    category: Optional[str] = None
+    unit: Optional[str] = None
+    cost_price: Optional[float] = None
+    selling_price: Optional[float] = None
+    reorder_level: Optional[float] = None
+    current_stock: Optional[float] = None
+
+
+class ProductResponse(BaseModel):
+    id: int
+    product_id: Optional[str] = None
+    name: str
+    category: str
+    unit: str
+    cost_price: float
+    selling_price: float
+    reorder_level: float
+    current_stock: float
+    is_low_stock: bool = False
+    created_at: datetime
+
+
+# --- Customer Models ---
+class CustomerCreate(BaseModel):
+    name: str
+    phone: str
+    language: str = "hi"
+    credit_limit: float = 5000.0
+    current_balance: float = 0.0
+    address: Optional[str] = None
+
+
+class CustomerUpdate(BaseModel):
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    language: Optional[str] = None
+    credit_limit: Optional[float] = None
+    current_balance: Optional[float] = None
+    address: Optional[str] = None
+
+
+class CustomerResponse(BaseModel):
+    id: int
+    customer_id: Optional[str] = None
+    name: str
+    phone: str
+    language: str
+    credit_limit: float
+    current_balance: float
+    address: Optional[str] = None
+    created_at: datetime
+
+
+# --- Supplier Models ---
+class SupplierCreate(BaseModel):
+    name: str
+    contact_person: Optional[str] = None
+    phone: str
+    category: Optional[str] = None
+    lead_time_days: int = 2
+    address: Optional[str] = None
+
+
+class SupplierUpdate(BaseModel):
+    name: Optional[str] = None
+    contact_person: Optional[str] = None
+    phone: Optional[str] = None
+    category: Optional[str] = None
+    lead_time_days: Optional[int] = None
+    address: Optional[str] = None
+
+
+class SupplierResponse(BaseModel):
+    id: int
+    supplier_id: Optional[str] = None
+    name: str
+    contact_person: Optional[str] = None
+    phone: str
+    category: Optional[str] = None
+    lead_time_days: int
+    address: Optional[str] = None
+    created_at: datetime
+
+
+# --- Purchase Models ---
+class PurchaseCreate(BaseModel):
+    supplier_id: Optional[str] = None
+    supplier_name: Optional[str] = None
+    product: str
+    quantity: float
+    unit: str = "kg"
+    unit_cost: float
+    payment_mode: str = "bank"
+
+
+class PurchaseResponse(BaseModel):
+    id: int
+    purchase_id: Optional[str] = None
+    supplier_id: Optional[str] = None
+    supplier_name: Optional[str] = None
+    product: str
+    quantity: float
+    unit: str
+    unit_cost: float
+    total_amount: float
+    status: str
+    created_at: datetime
+
+
+# --- Expense Models ---
+class ExpenseCreate(BaseModel):
+    category: str
+    amount: float
+    payment_mode: str = "cash"
+    description: Optional[str] = None
+
+
+class ExpenseResponse(BaseModel):
+    id: int
+    expense_id: Optional[str] = None
+    category: str
+    amount: float
+    payment_mode: str
+    description: Optional[str] = None
+    date: datetime
+
+
+# --- Unified Multilingual Quick Entry Schema ---
+class BusinessEntryInput(BaseModel):
+    text: str
+    confirm: bool = False
+    lang: str = "auto"
+
+
+class BusinessEntryResult(BaseModel):
+    status: str
+    confidence: float
+    action: str
+    parsed: dict
+    record_id: Optional[str] = None
+    message: str

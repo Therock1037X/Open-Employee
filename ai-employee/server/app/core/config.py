@@ -44,6 +44,11 @@ class Settings(BaseSettings):
     EXOTEL_SID: str | None = os.getenv("EXOTEL_SID")
     EXOTEL_API_KEY: str | None = os.getenv("EXOTEL_API_KEY")
     EXOTEL_API_TOKEN: str | None = os.getenv("EXOTEL_API_TOKEN")
+    EXOTEL_SUBDOMAIN: str = os.getenv("EXOTEL_SUBDOMAIN", "api.exotel.com")
+    EXOTEL_NUMBER: str | None = os.getenv("EXOTEL_NUMBER")
+
+    # Testing & Fast Development
+    TEST_MODE: bool = os.getenv("TEST_MODE", "false").lower() in ("true", "1", "yes")
 
     # Payments & Integrations
     RAZORPAY_KEY_ID: str | None = os.getenv("RAZORPAY_KEY_ID")
